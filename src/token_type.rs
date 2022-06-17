@@ -88,8 +88,10 @@ pub enum TokenType {
   RightBrace,
   Newline,
 
+  // literals
   String,
   Identifier,
   Number,
+
   Eof,
 }

@@ -8,10 +8,6 @@ use std::io::Read;
 use rust_apl::scanner::Scanner;
 //use itertools::Itertools; 
 
-// move these out and make non public!!!
-use rust_apl::token::Token;
-use rust_apl::token_type::TokenType;
-
 // this struct defines our command line arguments
 /// A Rust Implementation of APL
 #[derive(Parser, Debug)]
@@ -50,36 +46,8 @@ fn run(s: String) {
   let mut scanner = Scanner::new(s);
   let scan_res = scanner.scan();
 
-//  match scan_res {
-//    Err(err) => println!("{:?}", err),
-////    Ok(_)    => println!("{:?}", &scanner.tokens),
-//    Ok(_)    => { 
-//                  for t in &scanner.tokens {
-//                    println!("{:?}", t);
-//                  }
-//                },
-//  }
-
-    let mut line_counter = 0;
-
-    let res: Vec<Vec<Token>> = scanner.tokens.into_iter().fold(Vec::new(), |mut acc, x| {
-        if x.line > line_counter || acc.is_empty() {
-            line_counter =x.line;
-            acc.push(Vec::new());
-        }
-        acc.last_mut().unwrap().push(x);
-        acc
-    }).into_iter().map(|x| x.into_iter().rev().collect() ).collect();
-
-
-    for line in res {
-    println!("{:?}", line.len());
-
-
-      for t in line {
-        println!("{:?}", t);
-      }
-      println!("\n");
-    }
-
+  // for now, just print the Tokens
+  for t in scanner.tokens {
+    println!("{:?}", t);
+  }
 }

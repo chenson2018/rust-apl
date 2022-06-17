@@ -1,8 +1,8 @@
-use crate::token::Token;
+use std::io;
+
+use crate::token::{Token,AplType};
 use crate::token_type::TokenType;
 use crate::err::AplError;
-use crate::apl_type::AplType;
-use std::io;
 
 #[derive(Debug,Clone)]
 pub struct Scanner {
@@ -29,14 +29,37 @@ impl Scanner {
         self.source[(self.current - 1) as usize]
     }
 
+    // add and add_token accomplish the same thing, but for literals vs non-literals
     fn add(&mut self,token: TokenType) {
-        let lexeme = (&self.source[self.start as usize..self.current as usize]).iter().collect::<String>();
-        self.tokens.push(Token { token, lexeme, line: self.line, literal: None });
+        let lexeme = (&self.source[
+                                  self.start as usize..self.current as usize
+                                  ])
+                     .iter()
+                     .collect::<String>();
+
+        self.tokens.push(
+          Token { 
+            token,
+            lexeme,
+            line: self.line,
+            literal: None 
+          });
     }
 
     fn add_token(&mut self,token: TokenType,l: AplType) {
-        let lexeme = (&self.source[self.start as usize..self.current as usize]).iter().collect::<String>();
-        self.tokens.push(Token { token, lexeme, line: self.line, literal: Some(l) });
+        let lexeme = (&self.source[
+                                  self.start as usize..self.current as usize
+                                  ])
+                     .iter()
+                     .collect::<String>();
+
+        self.tokens.push(
+          Token { 
+            token,
+            lexeme,
+            line: self.line,
+            literal: Some(l)
+        });
     }
 
     fn is_end(&self) -> bool {
@@ -49,6 +72,7 @@ impl Scanner {
       let c = self.advance();
 
       match c {
+       // glyphs
        '←'  => { self.add(TokenType::LeftArrow); },
        '+'  => { self.add(TokenType::Plus); },
        '-'  => { self.add(TokenType::Minus); },
@@ -120,11 +144,6 @@ impl Scanner {
        '⍎' => { self.add(TokenType::Hydrant); },
        '⍕' => { self.add(TokenType::Thorn); },
        '⋄' => { self.add(TokenType::Diamond); },
-       '⍝' => {
-
-                    while self.peek() != '\n' && !(self.is_end()) {
-                        self.advance();
-                    } },
        '→' => { self.add(TokenType::RightArrow); },
        '⍵' => { self.add(TokenType::Omega); },
        '⍺' => { self.add(TokenType::Alpha); },
@@ -132,21 +151,30 @@ impl Scanner {
        '&' => { self.add(TokenType::Ampersand); },
        '¯' => { self.add(TokenType::HighMinus); },
        '⍬' => { self.add(TokenType::Zilde); },
-
-// non glyphs
+       // move past comments
+       '⍝' => { while self.peek() != '\n' && !(self.is_end()) {
+                  self.advance();
+                } 
+              },
+       // non glyphs
        '(' => { self.add(TokenType::LeftParenthesis); },
        ')' => { self.add(TokenType::RightParenthesis); },
        '{' => { self.add(TokenType::LeftBrace); },
        '}' => { self.add(TokenType::RightBrace); },
+       // strings (which is reall a vector of char scalars, may need to come back to fix this)
        '\'' => {
            if let Err(e) = self.string() {
                errs.push(e);
            }
        },
+       // end of line
        '\n' => { self.add(TokenType::Newline); self.line += 1; },
+
+       // whitespace
        ' ' => (),
        '\r' => (),
        '\t' => (),
+
        _ => {
            if c.is_ascii_digit() {
                if let Err(e) = self.number() {
@@ -168,18 +196,6 @@ impl Scanner {
       }
     }
 
-//    fn match_c(&mut self, expected: char) -> bool {
-//        if self.is_end() {
-//            return false;
-//        }
-//        if self.source[self.current as usize] != expected {
-//            return false;
-//        }
-//
-//        self.current += 1;
-//        true
-//    }
-
     fn peek(&mut self) -> char {
         if self.is_end() {
             '\0'
@@ -199,20 +215,43 @@ impl Scanner {
     pub fn scan(&mut self) -> Result<(),Vec<AplError>> {
       let mut errors: Vec<AplError> = Vec::new();
       let mut failed = false;
-        while !(self.is_end()) {
-            self.start = self.current;
-            if let Err(errs)  = self.scan_token() {
-                errors.extend(errs);
-                failed = true;
-            }
-        }
-        self.tokens.push(Token { token: TokenType::Eof, lexeme:"".to_string(), line:self.line, literal: None });
 
-        if failed {
-            Err(errors)
-        } else {
-            Ok(())
-        }
+      while !(self.is_end()) {
+          self.start = self.current;
+          if let Err(errs)  = self.scan_token() {
+              errors.extend(errs);
+              failed = true;
+          }
+      }
+      //self.tokens.push(Token { token: TokenType::Eof, lexeme:"".to_string(), line:self.line, literal: None });
+
+      // transformation to reverse each line
+      let mut line_counter = 0;
+
+      self.tokens = self.tokens
+                      .clone()
+                      .into_iter()
+                      .fold(Vec::new(), 
+                          |mut acc, x| 
+                          {
+                             if x.line > line_counter || acc.is_empty() 
+                             {
+                                line_counter =x.line;
+                                acc.push(Vec::new());
+                             }
+                         acc.last_mut().unwrap().push(x);
+                         acc
+                         })
+                      .into_iter()
+                      .map(|x| x.into_iter().rev().collect::<Vec<Token>>() )
+                      .flatten()
+                      .collect::<Vec<Token>>();
+
+      if failed {
+          Err(errors)
+      } else {
+          Ok(())
+      }
     }
 
     fn string(&mut self) -> Result<(),AplError> {
@@ -228,8 +267,14 @@ impl Scanner {
         }
 
         self.advance();
-        let s = (&self.source[(self.start + 1) as usize..(self.current - 1) as usize]).iter().collect::<String>();
+
+        let s = (&self.source[
+                             (self.start + 1) as usize..(self.current - 1) as usize]
+                ).iter()
+                 .collect::<String>();
+
         self.add_token(TokenType::String,AplType::String(s));
+
         Ok(())
     }
 
@@ -244,15 +289,22 @@ impl Scanner {
                 self.advance();
             }
         }
-        let s = &self.source[self.start as usize..self.current as usize].iter().collect::<String>();
+        let s = &self.source[
+                            self.start as usize..self.current as usize
+                            ]
+                .iter()
+                .collect::<String>();
+
         match s.parse::<f64>() {
-            Ok(n) => self.add_token(TokenType::Number,AplType::Number(n)),
+            Ok(n) => self.add_token(TokenType::Number, AplType::Number(n)),
             Err(e) => return Err(AplError::with_lower("Invalid number".to_string(),self.line,io::Error::new(io::ErrorKind::Other,e)))
         };
+
         Ok(())
     }
 
     fn identifier(&mut self) {
+        // need to come back and change these rules to match APL
         while self.peek().is_alphanumeric() || self.peek() == '_' || self.peek() == '-' {
             self.advance();
         }
