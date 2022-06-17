@@ -6,6 +6,13 @@ use std::fs::File;
 use std::io::Read;
 
 use rust_apl::scanner::Scanner;
+
+//temp
+use rust_apl::expr::Expr;
+use rust_apl::token::{Token,AplType};
+use rust_apl::token_type::TokenType;
+use std::rc::Rc;
+
 //use itertools::Itertools; 
 
 // this struct defines our command line arguments
@@ -50,4 +57,11 @@ fn run(s: String) {
   for t in scanner.tokens {
     println!("{:?}", t);
   }
+
+  let ex: Expr = Expr::Dyadic( Rc::new(Expr::Literal(AplType::Number(1.5))), 
+                              Token{ token: TokenType::Iota, lexeme: "⍳".to_string(), line: 0, literal: None},
+                               Rc::new(Expr::Literal(AplType::Number(7.0)))
+                             );
+
+  println!("{}", ex);
 }

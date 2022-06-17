@@ -1,5 +1,8 @@
+// this really should be public, rest are temporary
 pub mod scanner;
 
-mod token_type;
-mod token;
+// temporary
+pub mod expr;
+pub mod token_type;
+pub mod token;
 mod err;
