@@ -8,9 +8,9 @@ use crate::err::AplError;
 pub struct Scanner {
     source: Vec<char>,
     pub tokens: Vec<Token>,
-    current: i32,
-    line: i32,
-    start: i32
+    current: usize,
+    line: usize,
+    start: usize
 }
 
 impl Scanner {
@@ -26,13 +26,13 @@ impl Scanner {
 
     fn advance(&mut self) -> char {
         self.current += 1;
-        self.source[(self.current - 1) as usize]
+        self.source[self.current - 1]
     }
 
     // add and add_token accomplish the same thing, but for literals vs non-literals
     fn add(&mut self,token: TokenType) {
         let lexeme = (&self.source[
-                                  self.start as usize..self.current as usize
+                                  self.start..self.current
                                   ])
                      .iter()
                      .collect::<String>();
@@ -48,7 +48,7 @@ impl Scanner {
 
     fn add_token(&mut self,token: TokenType,l: AplType) {
         let lexeme = (&self.source[
-                                  self.start as usize..self.current as usize
+                                  self.start..self.current
                                   ])
                      .iter()
                      .collect::<String>();
@@ -63,7 +63,7 @@ impl Scanner {
     }
 
     fn is_end(&self) -> bool {
-        self.current >= (self.source.len() as i32)
+        self.current >= self.source.len()
     }
 
     fn scan_token(&mut self) -> Result<(),Vec<AplError>> {
@@ -200,15 +200,15 @@ impl Scanner {
         if self.is_end() {
             '\0'
         } else {
-            self.source[self.current as usize]
+            self.source[self.current]
         }
     }
 
     fn peek_next(&mut self) -> char {
-        if self.current + 1 >= (self.source.len() as i32) {
+        if self.current + 1 >= self.source.len() {
             '\0'
         } else {
-            self.source[(self.current + 1) as usize]
+            self.source[self.current + 1]
         }
     }
 
@@ -269,7 +269,7 @@ impl Scanner {
         self.advance();
 
         let s = (&self.source[
-                             (self.start + 1) as usize..(self.current - 1) as usize]
+                             (self.start + 1)..(self.current - 1)]
                 ).iter()
                  .collect::<String>();
 
@@ -290,7 +290,7 @@ impl Scanner {
             }
         }
         let s = &self.source[
-                            self.start as usize..self.current as usize
+                            self.start..self.current
                             ]
                 .iter()
                 .collect::<String>();
@@ -308,7 +308,7 @@ impl Scanner {
         while self.peek().is_alphanumeric() || self.peek() == '_' || self.peek() == '-' {
             self.advance();
         }
-        let s = (&self.source[self.start as usize..self.current as usize]).iter().collect::<String>();
+        let s = (&self.source[self.start..self.current]).iter().collect::<String>();
         self.add_token(TokenType::Identifier, AplType::Name(s));
     }
 }

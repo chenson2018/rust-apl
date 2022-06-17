@@ -4,7 +4,7 @@ use std::fmt;
 
 #[derive(Debug)]
 pub struct AplError {
-    line: i32,
+    line: usize,
     err: String,
     lower: Option<io::Error>
 }
@@ -30,7 +30,7 @@ impl fmt::Display for AplError {
 }
 
 impl AplError {
-    pub fn new(s: String,l: i32) -> AplError {
+    pub fn new(s: String,l: usize) -> AplError {
         AplError {
             line: l,
             err: s,
@@ -38,7 +38,7 @@ impl AplError {
         }
     }
 
-    pub fn with_lower(s: String,l: i32,e: io::Error) -> AplError {
+    pub fn with_lower(s: String,l: usize,e: io::Error) -> AplError {
         AplError {
             line: l,
             err: s,
