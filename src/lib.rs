@@ -1,6 +1,6 @@
 pub mod scanner;
 
-mod token_type;
+pub mod token_type;
 mod apl_type;
-mod token;
+pub mod token;
 mod err;

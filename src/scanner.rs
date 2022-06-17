@@ -143,7 +143,7 @@ impl Scanner {
                errs.push(e);
            }
        },
-       '\n' => { self.line += 1; self.add(TokenType::Newline); },
+       '\n' => { self.add(TokenType::Newline); self.line += 1; },
        ' ' => (),
        '\r' => (),
        '\t' => (),
