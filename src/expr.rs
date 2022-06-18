@@ -8,6 +8,7 @@ pub enum Expr {
   Dyadic(Rc<Expr>,Token,Rc<Expr>),
   Monadic(Token,Rc<Expr>),
   Literal(AplType),
+  Variable(Token),
 }
 
 impl fmt::Display for Expr {
@@ -25,22 +26,9 @@ impl fmt::Display for Expr {
             &Expr::Monadic(ref token,ref e) => {
                 write!(f,"({} {})",&token.lexeme,e)
             },
-           // &Expr::Variable(ref token) => {
-           //     write!(f,"var({})",&token.lexeme)
-           // },
-           // &Expr::Assign(ref token,ref e) => {
-           //     write!(f,"{} = {}",&token.lexeme,e)
-           // },
-           // &Expr::Logical(ref left,ref token,ref right) => {
-           //     write!(f,"({} {} {})",left,&token.lexeme,right)
-           // },
-           // &Expr::Call(ref calle,_,ref args) => {
-           //     write!(f,"{}(",calle)?;
-           //     for a in args {
-           //         write!(f,"{},",a)?;
-           //     }
-           //     write!(f,")")
-           // }
+            &Expr::Variable(ref token) => {
+                write!(f,"var({})",&token.lexeme)
+            },
         }
     }
 }

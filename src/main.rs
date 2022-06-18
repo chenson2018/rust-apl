@@ -6,12 +6,13 @@ use std::fs::File;
 use std::io::Read;
 
 use rust_apl::scanner::Scanner;
+use rust_apl::parser::Parser as AplParser;
 
 //temp
-use rust_apl::expr::Expr;
-use rust_apl::token::{Token,AplType};
-use rust_apl::token_type::TokenType;
-use std::rc::Rc;
+//use rust_apl::expr::Expr;
+//use rust_apl::token::{Token,AplType};
+//use rust_apl::token_type::TokenType;
+//use std::rc::Rc;
 
 //use itertools::Itertools; 
 
@@ -51,17 +52,25 @@ fn main() {
 fn run(s: String) {
   io::stdout().flush().unwrap();
   let mut scanner = Scanner::new(s);
-  let scan_res = scanner.scan();
+  scanner.scan().unwrap();
 
-  // for now, just print the Tokens
-  for t in scanner.tokens {
-    println!("{:?}", t);
-  }
+//  // for now, just print the Tokens
+//  for t in &scanner.tokens {
+//    println!("{:?}", t);
+//  }
+//
+//  println!("");
 
-  let ex: Expr = Expr::Dyadic( Rc::new(Expr::Literal(AplType::Number(1.5))), 
-                              Token{ token: TokenType::Iota, lexeme: "⍳".to_string(), line: 0, literal: None},
-                               Rc::new(Expr::Literal(AplType::Number(7.0)))
-                             );
+  let mut parser = AplParser::new(scanner.tokens);
+  let ast = parser.parse().unwrap();
 
-  println!("{}", ex);
+  println!("{}", ast);
+
+//
+//  let ex: Expr = Expr::Dyadic( Rc::new(Expr::Literal(AplType::Number(1.5))), 
+//                              Token{ token: TokenType::Iota, lexeme: "⍳".to_string(), line: 0, literal: None},
+//                               Rc::new(Expr::Literal(AplType::Number(7.0)))
+//                             );
+//
+//  println!("{}", ex);
 }
