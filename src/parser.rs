@@ -70,6 +70,7 @@ impl Parser {
     fn dyadic(&mut self) -> ParseResult {
        let mut e = self.primary()?;
 
+       // this assumes every primitive can be monadic or dyadic, is that true? probably not
        while self.match_t(vec![TokenType::Minus,TokenType::Plus]) {
          let op = self.previous();
          let right = self.primary();
@@ -84,27 +85,29 @@ impl Parser {
 
     // this part needs a loop to handle things like 1 (1+1) 3 4
     fn primary(&mut self) -> ParseResult {
-        //let mut v: Vec<crate::expr::Expr> = Vec::new();
+        let mut v: Vec<crate::expr::Expr> = Vec::new();
 
-        //while self.match_t(vec![TokenType::Number,TokenType::String]) {
-        //  v.push(Expr::Literal(self.previous().literal.unwrap()));
-        //  return Ok(crate::expr::Expr::Array(v))
-        //}
 
-        if self.match_t(vec![TokenType::Number,TokenType::String]) {
-            return Ok(Expr::Literal(self.previous().literal.unwrap()))
-        }
-
-        if self.match_t(vec![TokenType::Identifier]) {
-            return Ok(Expr::Variable(self.previous()))
+        while self.match_t(vec![TokenType::Number,TokenType::String,TokenType::Identifier]) {
+           match self.previous().token {
+              TokenType::Number | TokenType::String => { v.push(Expr::Literal(self.previous().literal.unwrap())); },             
+              TokenType::Identifier                 => { v.push(Expr::Variable(self.previous())); },
+              _ => panic!("Only Number, String, Identifier should be reachable here..."),
+           }
         }
 
         if self.match_t(vec![TokenType::RightParenthesis]) {
             let e = self.expression()?;
             self.consume(TokenType::LeftParenthesis,"Expected ')' after expression".to_string())?;
-            return Ok(Expr::Grouping(Rc::new(e)))
+            v.push(Expr::Grouping(Rc::new(e)))
         };
 
+        if v.len() == 1 {
+          return Ok(v.clone().into_iter().nth(0).unwrap());
+        } else {
+          return Ok(crate::expr::Expr::Array(v.into_iter().rev().collect::<Vec<Expr>>()));
+        }
+           
         Err(AplError::new("Expected expression".to_string(),self.peek().line))
     }
 
