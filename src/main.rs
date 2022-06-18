@@ -6,6 +6,7 @@ use std::fs::File;
 use std::io::Read;
 
 use rust_apl::scanner::Scanner;
+use rust_apl::interpreter::Interpreter;
 use rust_apl::parser::Parser as AplParser;
 
 //temp
@@ -29,12 +30,14 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
+    let mut interpreter = Interpreter::new();
+
     match args.path {
       // if a path is provided, execute that file
       Some(p) => {
         let mut buffer = String::new();
         File::open(p).unwrap().read_to_string(&mut buffer).unwrap();
-        run(buffer)
+        run(buffer, &mut interpreter)
       },
 
       // otherwise enter an interactive session
@@ -44,35 +47,30 @@ fn main() {
           io::stdout().flush().unwrap();
           let mut line = String::new();
           io::stdin().read_line(&mut line).unwrap();
-          run(line);
+          run(line, &mut interpreter);
         }
       }
 }
 
-fn run(s: String) {
+fn run(s: String, i: &mut Interpreter) {
   io::stdout().flush().unwrap();
   let mut scanner = Scanner::new(s);
   scanner.scan().unwrap();
 
-//  // for now, just print the Tokens
-//  for t in &scanner.tokens {
-//    println!("{:?}", t);
-//  }
-//
-//  println!("");
-
   let mut parser = AplParser::new(scanner.tokens);
-  let ast = parser.parse().unwrap();
+  let ast = parser.parse();
 
-  println!("{}", &ast);
-  println!("");
-  println!("{:?}", &ast);
-
-//
-//  let ex: Expr = Expr::Dyadic( Rc::new(Expr::Literal(AplType::Number(1.5))), 
-//                              Token{ token: TokenType::Iota, lexeme: "⍳".to_string(), line: 0, literal: None},
-//                               Rc::new(Expr::Literal(AplType::Number(7.0)))
-//                             );
-//
-//  println!("{}", ex);
+  // these errors aren't propogated up correctly yet, see the error handling I did for monadics...
+  match ast {
+    Ok(ast) => {
+       // assuming a value for right now, really this will be () that prints is not an assignment
+       let value = i.interpret(&ast).unwrap();
+     
+       println!("Polish notation: {}\n", &ast);
+       println!("Rust AST: {:?}\n", &ast);
+       println!("Evaluates to: {:?}\n", value);
+       println!("{}\n", value);
+    },
+    Err(err) => println!("{:?}", err),
+  }
 }

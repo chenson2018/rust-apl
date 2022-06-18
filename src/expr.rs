@@ -31,11 +31,11 @@ impl fmt::Display for Expr {
                 write!(f,"var({})",&token.lexeme)
             },
            &Expr::Array(ref vec) => {
-              write!(f, "[");
+              write!(f, "[")?;
               for v in vec {
                 write!(f, " {}", v)?;
               }
-              write!(f, "]");
+              write!(f, "]")?;
               Ok(())
             },
         }

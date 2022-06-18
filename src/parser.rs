@@ -74,7 +74,8 @@ impl Parser {
        while self.match_t(vec![TokenType::Minus,TokenType::Plus]) {
          let op = self.previous();
          let right = self.primary();
-         
+
+         // this is not good....
          match right {
             Ok(r)  => { e = Expr::Dyadic(Rc::new(r),op,Rc::new(e)); },
             Err(_) => { e = Expr::Monadic(op,Rc::new(e))          ; },
@@ -83,32 +84,32 @@ impl Parser {
        Ok(e)
     }
 
-    // this part needs a loop to handle things like 1 (1+1) 3 4
     fn primary(&mut self) -> ParseResult {
         let mut v: Vec<crate::expr::Expr> = Vec::new();
 
 
-        while self.match_t(vec![TokenType::Number,TokenType::String,TokenType::Identifier]) {
+        while self.match_t(vec![TokenType::Number,TokenType::String,TokenType::Identifier,TokenType::RightParenthesis,TokenType::LeftParenthesis]) {
            match self.previous().token {
               TokenType::Number | TokenType::String => { v.push(Expr::Literal(self.previous().literal.unwrap())); },             
               TokenType::Identifier                 => { v.push(Expr::Variable(self.previous())); },
+              TokenType::RightParenthesis => {
+                let e = self.expression()?;
+                self.consume(TokenType::LeftParenthesis,"Unmatched paren".to_string())?;
+                v.push(Expr::Grouping(Rc::new(e)));
+              }
+              TokenType::LeftParenthesis => { panic!("unterminated paren"); },
               _ => panic!("Only Number, String, Identifier should be reachable here..."),
            }
         }
 
-        if self.match_t(vec![TokenType::RightParenthesis]) {
-            let e = self.expression()?;
-            self.consume(TokenType::LeftParenthesis,"Expected ')' after expression".to_string())?;
-            v.push(Expr::Grouping(Rc::new(e)))
-        };
-
-        if v.len() == 1 {
+        if v.len() == 0 {
+          Err(AplError::new("Expected expression".to_string(),self.peek().line))
+        } else if v.len() == 1 {
           return Ok(v.clone().into_iter().nth(0).unwrap());
         } else {
           return Ok(crate::expr::Expr::Array(v.into_iter().rev().collect::<Vec<Expr>>()));
         }
            
-        Err(AplError::new("Expected expression".to_string(),self.peek().line))
     }
 
 }
