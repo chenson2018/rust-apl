@@ -64,47 +64,25 @@ impl Parser {
     }
 
     pub fn expression(&mut self) -> ParseResult {
-      self.equality()
-    }
-    pub fn equality(&mut self) -> ParseResult {
-      self.comparison()
-    }
-    pub fn comparison(&mut self) -> ParseResult {
-      self.term()
+      self.dyadic()
     }
 
-    pub fn term(&mut self) -> ParseResult {
-        let mut e = self.factor()?;
+    fn dyadic(&mut self) -> ParseResult {
+       let mut e = self.primary()?;
 
-        while self.match_t(vec![TokenType::Minus, TokenType::Plus]) {
-            let op = self.previous();
-            let right = self.factor()?;
-            e = Expr::Dyadic(Rc::new(e),op,Rc::new(right));
-        }
-        Ok(e)
+       while self.match_t(vec![TokenType::Minus,TokenType::Plus]) {
+         let op = self.previous();
+         let right = self.primary();
+         
+         match right {
+            Ok(r)  => { e = Expr::Dyadic(Rc::new(r),op,Rc::new(e)); },
+            Err(_) => { e = Expr::Monadic(op,Rc::new(e))          ; },
+         }
+       }
+       Ok(e)
     }
 
-    fn factor(&mut self) -> ParseResult {
-        let mut e = self.monadic()?;
-
-        while self.match_t(vec![TokenType::Slash,TokenType::Star]) {
-            let op = self.previous();
-            let right = self.monadic()?;
-            e = Expr::Dyadic(Rc::new(e),op,Rc::new(right));
-        }
-        Ok(e)
-    }
-
-    fn monadic(&mut self) -> ParseResult {
-        if self.match_t(vec![TokenType::ExclamationMark,TokenType::Minus]) {
-            let op = self.previous();
-            let right = self.monadic()?;
-            return Ok(Expr::Monadic(op,Rc::new(right)));
-        }
-
-        self.primary()
-    }
-
+    // this part needs a loop to handle things like 1 (1+1) 3 4
     fn primary(&mut self) -> ParseResult {
         if self.match_t(vec![TokenType::Number,TokenType::String]) {
             return Ok(Expr::Literal(self.previous().literal.unwrap()))

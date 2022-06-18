@@ -64,7 +64,9 @@ fn run(s: String) {
   let mut parser = AplParser::new(scanner.tokens);
   let ast = parser.parse().unwrap();
 
-  println!("{}", ast);
+  println!("{}", &ast);
+  println!("");
+  println!("{:?}", &ast);
 
 //
 //  let ex: Expr = Expr::Dyadic( Rc::new(Expr::Literal(AplType::Number(1.5))), 
