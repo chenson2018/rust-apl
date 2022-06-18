@@ -84,6 +84,13 @@ impl Parser {
 
     // this part needs a loop to handle things like 1 (1+1) 3 4
     fn primary(&mut self) -> ParseResult {
+        //let mut v: Vec<crate::expr::Expr> = Vec::new();
+
+        //while self.match_t(vec![TokenType::Number,TokenType::String]) {
+        //  v.push(Expr::Literal(self.previous().literal.unwrap()));
+        //  return Ok(crate::expr::Expr::Array(v))
+        //}
+
         if self.match_t(vec![TokenType::Number,TokenType::String]) {
             return Ok(Expr::Literal(self.previous().literal.unwrap()))
         }
