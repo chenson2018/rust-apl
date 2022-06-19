@@ -26,7 +26,7 @@ pub fn add(left: AplType, right: AplType) -> Option<AplType> {
             let z: Vec<AplType> = l
                 .iter()
                 .zip(r)
-                .map(|(a, b)| add(a.clone(), b.clone()).unwrap())
+                .map(|(a, b)| add(a.clone(), b).unwrap())
                 .collect();
             Some(AplType::Array(z))
         }
