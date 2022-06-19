@@ -273,7 +273,18 @@ impl Scanner {
                 ).iter()
                  .collect::<String>();
 
-        self.add_token(TokenType::String,AplType::String(s));
+        // for right now I'm doing this hack because the string arrays are UGLY
+        // but... I kinda like it?
+        // there is something philosophically interesting about changing input in the scanner
+        // but it makes the parserer way more consistent...
+
+        self.add(TokenType::LeftParenthesis);
+
+        for c in s.chars() { 
+          self.add_token(TokenType::String,AplType::String(c.to_string()));  
+        }
+
+        self.add(TokenType::RightParenthesis);
 
         Ok(())
     }
