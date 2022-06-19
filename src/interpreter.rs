@@ -1,6 +1,6 @@
-use crate::token::AplType;
-use crate::expr::Expr;
 use crate::err::AplError;
+use crate::expr::Expr;
+use crate::token::AplType;
 use crate::token_type::TokenType;
 
 use crate::primitives::dyadic::add;
@@ -10,7 +10,7 @@ use crate::primitives::monadic::shape;
 pub enum InterpreterError {
     AplError(AplError),
     AplErrors(Vec<AplError>),
-    Return(AplType)
+    Return(AplType),
 }
 
 impl From<AplError> for InterpreterError {
@@ -26,43 +26,46 @@ impl From<Vec<AplError>> for InterpreterError {
 }
 
 #[derive(Clone)]
-pub struct Interpreter { }
+pub struct Interpreter {}
 
 impl Interpreter {
     pub fn new() -> Interpreter {
-        Interpreter { }
+        Interpreter {}
     }
 
-    pub fn interpret(&mut self, e: &Expr) -> Result<AplType,InterpreterError> {
-      self.evaluate(e)
+    pub fn interpret(&mut self, e: &Expr) -> Result<AplType, InterpreterError> {
+        self.evaluate(e)
     }
 
-    fn evaluate(&mut self,e: &Expr) -> Result<AplType,InterpreterError> {
-      match e {
-        &Expr::Array(ref t) => {
-          let res =  t.into_iter().map(|x| self.evaluate(x).unwrap() ).collect::<Vec<AplType>>();
-          Ok(AplType::Array(res))
-        },
-        &Expr::Literal(ref t) => Ok(t.clone()),
-        &Expr::Grouping(ref expr) => self.evaluate(expr),
-        &Expr::Dyadic(ref left,ref op,ref right) => {
-          let left = self.evaluate(left)?;
-          let right = self.evaluate(right)?;
+    fn evaluate(&mut self, e: &Expr) -> Result<AplType, InterpreterError> {
+        match e {
+            &Expr::Array(ref t) => {
+                let res = t
+                    .into_iter()
+                    .map(|x| self.evaluate(x).unwrap())
+                    .collect::<Vec<AplType>>();
+                Ok(AplType::Array(res))
+            }
+            &Expr::Literal(ref t) => Ok(t.clone()),
+            &Expr::Grouping(ref expr) => self.evaluate(expr),
+            &Expr::Dyadic(ref left, ref op, ref right) => {
+                let left = self.evaluate(left)?;
+                let right = self.evaluate(right)?;
 
-          match op.token {
-              TokenType::Plus => { Ok(add(left, right).unwrap()) },
-              _ => todo!("need more dyadic operators..."),
-          }
-        },
-        &Expr::Monadic(ref op,ref right) => {
-          let right = self.evaluate(right)?;
+                match op.token {
+                    TokenType::Plus => Ok(add(left, right).unwrap()),
+                    _ => todo!("need more dyadic operators..."),
+                }
+            }
+            &Expr::Monadic(ref op, ref right) => {
+                let right = self.evaluate(right)?;
 
-          match op.token {
-              TokenType::Rho => { Ok(shape(right).unwrap()) },
-              _ => todo!("need more mondic operators..."),
-          }
-        },
-        _ => todo!("more primitive stuff..."),
-      }
+                match op.token {
+                    TokenType::Rho => Ok(shape(right).unwrap()),
+                    _ => todo!("need more mondic operators..."),
+                }
+            }
+            _ => todo!("more primitive stuff..."),
+        }
     }
 }

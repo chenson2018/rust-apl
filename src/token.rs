@@ -1,7 +1,7 @@
 use crate::token_type::TokenType;
 use std::fmt;
 
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub enum AplType {
     String(String),
     Number(f64),
@@ -10,26 +10,24 @@ pub enum AplType {
 }
 
 impl fmt::Display for AplType {
-    fn fmt(&self,f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            &AplType::String(ref s) => write!(f,"{}",s),
-            &AplType::Number(ref n) => write!(f,"{}",n),
-            &AplType::Name(ref b) => write!(f,"{}",b),
+            &AplType::String(ref s) => write!(f, "{}", s),
+            &AplType::Number(ref n) => write!(f, "{}", n),
+            &AplType::Name(ref b) => write!(f, "{}", b),
             &AplType::Array(ref vec) => {
-              write!(f, "[")?;
-              for v in vec {
-                write!(f, " {} ", v)?;
-              }
-              write!(f, "]")?;
-              Ok(())
-            },
+                write!(f, "[")?;
+                for v in vec {
+                    write!(f, " {} ", v)?;
+                }
+                write!(f, "]")?;
+                Ok(())
+            }
         }
     }
 }
 
-
-
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub struct Token {
     pub token: TokenType,
     pub lexeme: String,
