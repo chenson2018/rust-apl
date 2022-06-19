@@ -14,10 +14,7 @@ type ParseResult = Result<Expr, AplError>;
 
 impl Parser {
     pub fn new(tokens: Vec<Token>) -> Parser {
-        Parser {
-            current: 0,
-            tokens: tokens,
-        }
+        Parser { current: 0, tokens }
     }
 
     // Helper methods
@@ -40,14 +37,14 @@ impl Parser {
     }
 
     fn check(&mut self, t: TokenType) -> bool {
-        if self.is_end() {
+        if self.at_end() {
             return false;
         }
         self.peek().token == t
     }
 
     fn advance(&mut self) -> Token {
-        if !self.is_end() {
+        if !self.at_end() {
             self.current += 1;
         }
         self.previous()
@@ -62,7 +59,7 @@ impl Parser {
         self.tokens[self.current - 1].clone()
     }
 
-    fn is_end(&mut self) -> bool {
+    fn at_end(&mut self) -> bool {
         self.peek().token == TokenType::Eof
     }
 
@@ -96,7 +93,7 @@ impl Parser {
     }
 
     fn primary(&mut self) -> ParseResult {
-        let mut v: Vec<crate::expr::Expr> = Vec::new();
+        let mut v: Vec<Expr> = Vec::new();
 
         loop {
             if self.match_t(vec![
@@ -128,17 +125,15 @@ impl Parser {
             };
         }
 
-        if v.len() == 0 {
+        if v.is_empty() {
             Err(AplError::new(
                 "Expected expression".to_string(),
                 self.peek().line,
             ))
         } else if v.len() == 1 {
-            return Ok(v.clone().into_iter().nth(0).unwrap());
+            Ok(v.clone().into_iter().next().unwrap())
         } else {
-            return Ok(crate::expr::Expr::Array(
-                v.into_iter().rev().collect::<Vec<Expr>>(),
-            ));
+            Ok(Expr::Array(v.into_iter().rev().collect::<Vec<Expr>>()))
         }
     }
 }

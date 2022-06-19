@@ -408,8 +408,7 @@ impl Scanner {
                 acc
             })
             .into_iter()
-            .map(|x| x.into_iter().rev().collect::<Vec<Token>>())
-            .flatten()
+            .flat_map(|x| x.into_iter().rev().collect::<Vec<Token>>())
             .collect::<Vec<Token>>();
 
         if failed {

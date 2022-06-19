@@ -28,6 +28,12 @@ impl From<Vec<AplError>> for InterpreterError {
 #[derive(Clone)]
 pub struct Interpreter {}
 
+impl Default for Interpreter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Interpreter {
     pub fn new() -> Interpreter {
         Interpreter {}
@@ -38,17 +44,17 @@ impl Interpreter {
     }
 
     fn evaluate(&mut self, e: &Expr) -> Result<AplType, InterpreterError> {
-        match e {
-            &Expr::Array(ref t) => {
+        match *e {
+            Expr::Array(ref t) => {
                 let res = t
-                    .into_iter()
+                    .iter()
                     .map(|x| self.evaluate(x).unwrap())
                     .collect::<Vec<AplType>>();
                 Ok(AplType::Array(res))
             }
-            &Expr::Literal(ref t) => Ok(t.clone()),
-            &Expr::Grouping(ref expr) => self.evaluate(expr),
-            &Expr::Dyadic(ref left, ref op, ref right) => {
+            Expr::Literal(ref t) => Ok(t.clone()),
+            Expr::Grouping(ref expr) => self.evaluate(expr),
+            Expr::Dyadic(ref left, ref op, ref right) => {
                 let left = self.evaluate(left)?;
                 let right = self.evaluate(right)?;
 
@@ -57,7 +63,7 @@ impl Interpreter {
                     _ => todo!("need more dyadic operators..."),
                 }
             }
-            &Expr::Monadic(ref op, ref right) => {
+            Expr::Monadic(ref op, ref right) => {
                 let right = self.evaluate(right)?;
 
                 match op.token {
