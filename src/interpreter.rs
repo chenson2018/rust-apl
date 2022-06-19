@@ -4,6 +4,7 @@ use crate::err::AplError;
 use crate::token_type::TokenType;
 
 use crate::primitives::dyadic::add;
+use crate::primitives::monadic::shape;
 
 #[derive(Debug)]
 pub enum InterpreterError {
@@ -45,7 +46,6 @@ impl Interpreter {
         &Expr::Literal(ref t) => Ok(t.clone()),
         &Expr::Grouping(ref expr) => self.evaluate(expr),
         &Expr::Dyadic(ref left,ref op,ref right) => {
-          // here I would eventually like a general way to define a function and then import, APL has too many to shove it all here
           let left = self.evaluate(left)?;
           let right = self.evaluate(right)?;
 
@@ -53,7 +53,15 @@ impl Interpreter {
               TokenType::Plus => { Ok(add(left, right).unwrap()) },
               _ => todo!("need more dyadic operators..."),
           }
-        }
+        },
+        &Expr::Monadic(ref op,ref right) => {
+          let right = self.evaluate(right)?;
+
+          match op.token {
+              TokenType::Rho => { Ok(shape(right).unwrap()) },
+              _ => todo!("need more mondic operators..."),
+          }
+        },
         _ => todo!("more primitive stuff..."),
       }
     }
