@@ -1,4 +1,4 @@
-#[macro_use]
-mod macros;
+//#[macro_use]
+//mod macros;
 pub mod dyadic;
 pub mod monadic;
