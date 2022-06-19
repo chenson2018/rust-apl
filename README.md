@@ -1,7 +1,7 @@
 # rust-apl
 
 > **Note**
-> This is a work in progress!
+> This is a work in progress. Almost nothing is done and what is is probably wrong in some way!
 
 This repo constructs an interpreter for the APL programming language, written in Rust. 
 
