@@ -1,7 +1,8 @@
 use std::io;
 
+use crate::apl_type::AplType;
 use crate::err::AplError;
-use crate::token::{AplType, Token};
+use crate::token::Token;
 use crate::token_type::TokenType;
 
 #[derive(Debug, Clone)]

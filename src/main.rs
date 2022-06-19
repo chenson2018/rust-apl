@@ -9,14 +9,6 @@ use rust_apl::interpreter::Interpreter;
 use rust_apl::parser::Parser as AplParser;
 use rust_apl::scanner::Scanner;
 
-//temp
-//use rust_apl::expr::Expr;
-//use rust_apl::token::{Token,AplType};
-//use rust_apl::token_type::TokenType;
-//use std::rc::Rc;
-
-//use itertools::Itertools;
-
 // this struct defines our command line arguments
 /// A Rust Implementation of APL
 #[derive(Parser, Debug)]

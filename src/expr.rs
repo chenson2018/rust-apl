@@ -1,4 +1,5 @@
-use crate::token::{AplType, Token};
+use crate::apl_type::AplType;
+use crate::token::Token;
 use std::fmt;
 use std::rc::Rc;
 

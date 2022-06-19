@@ -1,6 +1,6 @@
+use crate::apl_type::AplType;
 use crate::err::AplError;
 use crate::expr::Expr;
-use crate::token::AplType;
 use crate::token_type::TokenType;
 
 use crate::primitives::dyadic::add;

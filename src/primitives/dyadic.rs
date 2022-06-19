@@ -1,4 +1,4 @@
-use crate::token::AplType;
+use crate::apl_type::AplType;
 
 // I should change this type to a result and then implement a cast into the approprate error reporting so as to isolate the error from the reporting of the error
 // the zip allows some implicit skipping... kinda interesting

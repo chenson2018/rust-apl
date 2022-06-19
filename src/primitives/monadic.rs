@@ -1,4 +1,4 @@
-use crate::token::AplType;
+use crate::apl_type::AplType;
 
 pub fn shape(right: AplType) -> Option<AplType> {
     match right {
