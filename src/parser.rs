@@ -87,19 +87,20 @@ impl Parser {
     fn primary(&mut self) -> ParseResult {
         let mut v: Vec<crate::expr::Expr> = Vec::new();
 
-
-        while self.match_t(vec![TokenType::Number,TokenType::String,TokenType::Identifier,TokenType::RightParenthesis,TokenType::LeftParenthesis]) {
-           match self.previous().token {
-              TokenType::Number | TokenType::String => { v.push(Expr::Literal(self.previous().literal.unwrap())); },             
-              TokenType::Identifier                 => { v.push(Expr::Variable(self.previous())); },
-              TokenType::RightParenthesis => {
-                let e = self.expression()?;
-                self.consume(TokenType::LeftParenthesis,"Unmatched paren".to_string())?;
-                v.push(Expr::Grouping(Rc::new(e)));
+        loop {
+           if self.match_t(vec![TokenType::Number,TokenType::String,TokenType::Identifier]) {
+              match self.previous().token {
+                 TokenType::Number | TokenType::String => { v.push(Expr::Literal(self.previous().literal.unwrap())); },             
+                 TokenType::Identifier                 => { v.push(Expr::Variable(self.previous())); },
+                 _ => panic!("Only Number, String, Identifier should be reachable here...got {:?}", self.previous().token),
               }
-              TokenType::LeftParenthesis => { panic!("unterminated paren"); },
-              _ => panic!("Only Number, String, Identifier should be reachable here..."),
-           }
+           } else if self.match_t(vec![TokenType::RightParenthesis]) {
+               let e = self.expression()?;
+               self.consume(TokenType::LeftParenthesis,"Expected '(' after expression".to_string())?;
+               v.push(Expr::Grouping(Rc::new(e)))
+           } else {
+             break;
+           };
         }
 
         if v.len() == 0 {

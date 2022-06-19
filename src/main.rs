@@ -57,6 +57,10 @@ fn run(s: String, i: &mut Interpreter) {
   let mut scanner = Scanner::new(s);
   scanner.scan().unwrap();
 
+//  for t in &scanner.tokens {
+//    println!("{:?}", *t);
+//  }
+
   let mut parser = AplParser::new(scanner.tokens);
   let ast = parser.parse();
 

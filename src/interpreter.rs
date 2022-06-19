@@ -58,6 +58,7 @@ impl Interpreter {
           let right = self.evaluate(right)?;
 
           match op.token {
+              // this fails: 1+((4 5 6) 4 5)
               TokenType::Plus => {
                 match (left,right) {
                   (AplType::Number(l),AplType::Number(r)) => Ok(AplType::Number(l+r)),

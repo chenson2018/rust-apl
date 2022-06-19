@@ -18,7 +18,7 @@ impl fmt::Display for AplType {
             &AplType::Array(ref vec) => {
               write!(f, "[")?;
               for v in vec {
-                write!(f, " {}", v)?;
+                write!(f, " {} ", v)?;
               }
               write!(f, "]")?;
               Ok(())
