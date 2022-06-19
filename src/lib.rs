@@ -1,5 +1,6 @@
 pub mod interpreter;
 pub mod parser;
+pub mod run;
 pub mod scanner;
 
 mod apl_type;

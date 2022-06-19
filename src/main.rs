@@ -6,8 +6,7 @@ use std::io::Read;
 use std::io::Write;
 
 use rust_apl::interpreter::Interpreter;
-use rust_apl::parser::Parser as AplParser;
-use rust_apl::scanner::Scanner;
+use rust_apl::run::run;
 
 // this struct defines our command line arguments
 /// A Rust Implementation of APL
@@ -34,7 +33,10 @@ fn main() {
         Some(p) => {
             let mut buffer = String::new();
             File::open(p).unwrap().read_to_string(&mut buffer).unwrap();
-            run(buffer, &mut interpreter, args.verbose)
+            match run(buffer, &mut interpreter, args.verbose) {
+                Ok(value) => println!("{}", value),
+                Err(err) => println!("{}", err),
+            };
         }
 
         // otherwise enter an interactive session
@@ -43,39 +45,10 @@ fn main() {
             io::stdout().flush().unwrap();
             let mut line = String::new();
             io::stdin().read_line(&mut line).unwrap();
-            run(line, &mut interpreter, args.verbose);
+            match run(line, &mut interpreter, args.verbose) {
+                Ok(value) => println!("{}", value),
+                Err(err) => println!("{}", err),
+            };
         },
-    }
-}
-
-fn run(s: String, i: &mut Interpreter, verbose: bool) {
-    io::stdout().flush().unwrap();
-    let mut scanner = Scanner::new(s);
-
-    match scanner.scan() {
-        Ok(_) => (),
-        Err(err) => println!("{:?}", err),
-    }
-
-    let mut parser = AplParser::new(scanner.tokens);
-    let ast = parser.parse();
-
-    // these errors aren't propogated up correctly yet, see the error handling I did for monadics...
-    match ast {
-        Ok(ast) => {
-            // assuming a value for right now, really this will be () that prints is not an assignment
-            let value = i.interpret(&ast).unwrap();
-
-            // interpreter debugging
-            if verbose {
-                println!("Polish notation: {}\n", &ast);
-                println!("Rust AST: {:?}\n", &ast);
-                println!("Evaluates to: {:?}\n", value);
-            }
-
-            // regular output
-            println!("{}\n", value);
-        }
-        Err(err) => println!("{:?}", err),
     }
 }
