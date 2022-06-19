@@ -27,7 +27,7 @@ impl Interpreter {
     }
 
     fn evaluate(&mut self, e: &Expr) -> Result<AplType, AplError> {
-        match &*e {
+        match e {
             Expr::Array(ref t) => {
                 let res = t
                     .iter()
