@@ -3,6 +3,8 @@ use crate::expr::Expr;
 use crate::err::AplError;
 use crate::token_type::TokenType;
 
+use crate::primitives::dyadic::add;
+
 #[derive(Debug)]
 pub enum InterpreterError {
     AplError(AplError),
@@ -20,16 +22,6 @@ impl From<Vec<AplError>> for InterpreterError {
     fn from(v: Vec<AplError>) -> InterpreterError {
         InterpreterError::AplErrors(v)
     }
-}
-
-// this is a macro to extract a value from a certain AplType, panicing (should make an error) if got the wrong type.
-macro_rules! as_variant {
-    ($value:expr, $variant:path) => {
-        match $value {
-            $variant(x) => Some(x),
-            _ => None,
-        }
-    };
 }
 
 #[derive(Clone)]
@@ -58,36 +50,7 @@ impl Interpreter {
           let right = self.evaluate(right)?;
 
           match op.token {
-              // this fails: 1+((4 5 6) 4 5)
-              TokenType::Plus => {
-                match (left,right) {
-                  (AplType::Number(l),AplType::Number(r)) => Ok(AplType::Number(l+r)),
-                  // this is really only working for vectors right now, need to go back and add a size dimension to AplType::Array
-                  // I wonder if there is a clean way to not have to write left and right versions of this???
-                  (AplType::Array(l),AplType::Number(r))  => {
-                    Ok(
-                      AplType::Array(
-                        l.into_iter()
-                         .map(|x| AplType::Number(r + as_variant!(x, AplType::Number).unwrap()))
-                         .collect()))
-                  },
-                  (AplType::Number(r),AplType::Array(l))  => {
-                    Ok(
-                      AplType::Array(
-                        l.into_iter()
-                         .map(|x| AplType::Number(r + as_variant!(x, AplType::Number).unwrap()))
-                         .collect()))
-                  },
-                  (AplType::Array(l),AplType::Array(r))  => {
-                    Ok(
-                      AplType::Array(
-                        l.iter().zip(&r).map(|(a, b)| AplType::Number(as_variant!(a, AplType::Number).unwrap() + as_variant!(b, AplType::Number).unwrap()) ).collect()
-                      )
-                    )
-                  },
-                  _ => panic!("string args to plus") 
-                }
-              },
+              TokenType::Plus => { Ok(add(left, right).unwrap()) },
               _ => todo!("need more dyadic operators..."),
           }
         }
