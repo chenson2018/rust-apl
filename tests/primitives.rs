@@ -15,14 +15,11 @@ mod test {
 
     #[test]
     fn add() {
-        // TODO: support higher dimensional arrays
-        // TODO: support interger and floating types
-        // TODO: test for errors on non numeric
-        // TODO: test for errors on size mismatches
-
         apl_assert("1+1", "2");
         apl_assert("5+1 2 3", "6 7 8");
         apl_assert("1 2 3+4 5 6", "5 7 9");
         apl_assert("(1 (2 3) (4 5))+(1 2 (3 4))", "2 (4 5) (7 9)");
     }
+
+  
 }

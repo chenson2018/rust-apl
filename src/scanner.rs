@@ -325,6 +325,7 @@ impl Scanner {
             '\'' => {
                 if let Err(e) = self.string() {
                     errs.push(e);
+                    failed = true;
                 }
             }
             // end of line
@@ -442,6 +443,10 @@ impl Scanner {
         // but it makes the parserer way more consistent...
 
         self.add(TokenType::LeftParenthesis);
+
+        if s.chars().count() == 0 {
+          self.add_token(TokenType::String, AplType::String("".to_string()));
+        }
 
         for c in s.chars() {
             self.add_token(TokenType::String, AplType::String(c.to_string()));

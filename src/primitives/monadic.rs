@@ -1,13 +1,13 @@
 use crate::apl_type::AplType;
 
-pub fn shape(right: AplType) -> Option<AplType> {
+// TODO: handle shape of arrays
+// TODO: handle difference between ⍴'' and ⍴0
+
+pub fn shape(right: AplType) -> Result<AplType, &'static str> {
     match right {
-        //assumes vectors for now
-        AplType::Number(_) => Some(AplType::Array(Vec::new())),
-        AplType::String(_) => Some(AplType::Array(Vec::new())),
-        AplType::Array(r) => Some(AplType::Array(vec![AplType::Number(r.len() as f64)])),
+        AplType::Number(_) => Ok(AplType::Array(Vec::new())),
+        AplType::String(_) => Ok(AplType::Array(Vec::new())),
+        AplType::Array(r) => Ok(AplType::Array(vec![AplType::Number(r.len() as f64)])),
         AplType::Name(_) => panic!("Function called on unevaluated name."),
-        // need to handle string as char vector better....
-        // can I represent a "scalar" type?
     }
 }

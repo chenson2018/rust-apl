@@ -6,25 +6,6 @@ use crate::token_type::TokenType;
 use crate::primitives::dyadic::add;
 use crate::primitives::monadic::shape;
 
-#[derive(Debug)]
-pub enum InterpreterError {
-    AplError(AplError),
-    AplErrors(Vec<AplError>),
-    Return(AplType),
-}
-
-impl From<AplError> for InterpreterError {
-    fn from(v: AplError) -> InterpreterError {
-        InterpreterError::AplError(v)
-    }
-}
-
-impl From<Vec<AplError>> for InterpreterError {
-    fn from(v: Vec<AplError>) -> InterpreterError {
-        InterpreterError::AplErrors(v)
-    }
-}
-
 #[derive(Clone)]
 pub struct Interpreter {}
 
@@ -34,17 +15,19 @@ impl Default for Interpreter {
     }
 }
 
+// TODO: properly report line of errors
+
 impl Interpreter {
     pub fn new() -> Interpreter {
         Interpreter {}
     }
 
-    pub fn interpret(&mut self, e: &Expr) -> Result<AplType, InterpreterError> {
+    pub fn interpret(&mut self, e: &Expr) -> Result<AplType, AplError> {
         self.evaluate(e)
     }
 
-    fn evaluate(&mut self, e: &Expr) -> Result<AplType, InterpreterError> {
-        match *e {
+    fn evaluate(&mut self, e: &Expr) -> Result<AplType, AplError> {
+        match &*e {
             Expr::Array(ref t) => {
                 let res = t
                     .iter()
@@ -58,20 +41,31 @@ impl Interpreter {
                 let left = self.evaluate(left)?;
                 let right = self.evaluate(right)?;
 
-                match op.token {
-                    TokenType::Plus => Ok(add(left, right).unwrap()),
-                    _ => todo!("need more dyadic operators..."),
+                let res = match op.token {
+                    TokenType::Plus => add(left, right),
+                    _ => todo!("Dyadic operator {:?}", op.token),
+                };
+
+                match res {
+                    Ok(value) => Ok(value),
+                    Err(err) => Err(AplError::new(err.to_string(), 0)),
                 }
             }
             Expr::Monadic(ref op, ref right) => {
                 let right = self.evaluate(right)?;
 
-                match op.token {
-                    TokenType::Rho => Ok(shape(right).unwrap()),
-                    _ => todo!("need more mondic operators..."),
+                let res =  match op.token {
+                    TokenType::Rho => shape(right),
+                    _ => todo!("Monadic operator {:?}", op.token),
+                };
+
+                match res {
+                    Ok(value) => Ok(value),
+                    Err(err) => Err(AplError::new(err.to_string(), 0)),
                 }
+    
             }
-            _ => todo!("more primitive stuff..."),
+            Expr::Variable(t) => todo!("Primitive {:?} not implemented.", t.token),
         }
     }
 }

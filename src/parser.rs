@@ -10,8 +10,6 @@ pub struct Parser {
     tokens: Vec<Token>,
 }
 
-type ParseResult = Result<Expr, AplError>;
-
 impl Parser {
     pub fn new(tokens: Vec<Token>) -> Parser {
         Parser { current: 0, tokens }
@@ -63,15 +61,15 @@ impl Parser {
         self.peek().token == TokenType::Eof
     }
 
-    pub fn parse(&mut self) -> ParseResult {
+    pub fn parse(&mut self) -> Result<Expr, AplError> {
         self.expression()
     }
 
-    pub fn expression(&mut self) -> ParseResult {
+    pub fn expression(&mut self) -> Result<Expr, AplError> {
         self.dyadic()
     }
 
-    fn dyadic(&mut self) -> ParseResult {
+    fn dyadic(&mut self) -> Result<Expr, AplError> {
         let mut e = self.primary()?;
 
         // this assumes every primitive can be monadic or dyadic, is that true? probably not
@@ -92,7 +90,7 @@ impl Parser {
         Ok(e)
     }
 
-    fn primary(&mut self) -> ParseResult {
+    fn primary(&mut self) -> Result<Expr, AplError> {
         let mut v: Vec<Expr> = Vec::new();
 
         loop {
