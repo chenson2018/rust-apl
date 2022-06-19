@@ -71,7 +71,7 @@ impl Parser {
        let mut e = self.primary()?;
 
        // this assumes every primitive can be monadic or dyadic, is that true? probably not
-       while self.match_t(vec![TokenType::Minus,TokenType::Plus]) {
+       while self.match_t(vec![TokenType::Minus,TokenType::Plus,TokenType::Rho]) {
          let op = self.previous();
          let right = self.primary();
 
