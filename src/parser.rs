@@ -107,7 +107,7 @@ impl Parser {
                         v.push(Expr::Variable(self.previous()));
                     }
                     _ => panic!(
-                        "Only Number, String, Identifier should be reachable here...got {:?}",
+                        "Only Number, String, Identifier should be reachable here...got {:#?}",
                         self.previous().token
                     ),
                 }
@@ -124,7 +124,7 @@ impl Parser {
         }
 
         //println!("What it looks like before we maybe enclose");
-        //println!("{:?}", v);
+        //println!("{:#?}", v);
 
         let all_lit = v.iter().all(|s| matches!(s, Expr::Literal(_)));
 

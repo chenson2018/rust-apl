@@ -55,7 +55,7 @@ impl Interpreter {
 
                 let res = match op.token {
                     TokenType::Plus => add(left, right),
-                    _ => todo!("Dyadic operator {:?}", op.token),
+                    _ => todo!("Dyadic operator {:#?}", op.token),
                 };
 
                 match res {
@@ -68,7 +68,7 @@ impl Interpreter {
 
                 let res = match op.token {
                     TokenType::Rho => shape(right),
-                    _ => todo!("Monadic operator {:?}", op.token),
+                    _ => todo!("Monadic operator {:#?}", op.token),
                 };
 
                 match res {
@@ -76,7 +76,7 @@ impl Interpreter {
                     Err(err) => Err(AplError::new(err.to_string(), 0)),
                 }
             }
-            Expr::Variable(t) => todo!("Primitive {:?} not implemented.", t.token),
+            Expr::Variable(t) => todo!("Primitive {:#?} not implemented.", t.token),
         }
     }
 }

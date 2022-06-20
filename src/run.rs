@@ -50,8 +50,8 @@ pub fn run(s: String, i: &mut Interpreter, verbose: bool) -> Result<AplType, Vec
 
     if verbose {
         println!("Polish notation: {}\n", &ast_verified);
-        println!("Rust AST: {:?}\n", &ast_verified);
-        println!("Evaluates to: {:?}\n", value_verified);
+        println!("Rust AST: {:#?}\n", &ast_verified);
+        println!("Evaluates to: {:#?}\n", value_verified);
     }
 
     Ok(value_verified)

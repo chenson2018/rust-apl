@@ -35,7 +35,7 @@ fn main() {
             File::open(p).unwrap().read_to_string(&mut buffer).unwrap();
             match run(buffer, &mut interpreter, args.verbose) {
                 Ok(value) => println!("{}", value),
-                Err(err) => println!("{:?}", err),
+                Err(err) => println!("{:#?}", err),
             };
         }
 
@@ -47,7 +47,7 @@ fn main() {
             io::stdin().read_line(&mut line).unwrap();
             match run(line, &mut interpreter, args.verbose) {
                 Ok(value) => println!("{}", value),
-                Err(err) => println!("{:?}", err),
+                Err(err) => println!("{:#?}", err),
             };
         },
     }
