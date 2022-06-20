@@ -1,7 +1,7 @@
 use std::io;
 
-use crate::apl_type::Scalar;
 use crate::apl_type::AplType;
+use crate::apl_type::Scalar;
 use crate::err::AplError;
 use crate::token::Token;
 use crate::token_type::TokenType;
@@ -446,11 +446,17 @@ impl Scanner {
         self.add(TokenType::LeftParenthesis);
 
         if s.chars().count() == 0 {
-          self.add_token(TokenType::String, AplType::Scalar(Scalar::String("".to_string()))    );
+            self.add_token(
+                TokenType::String,
+                AplType::Scalar(Scalar::String("".to_string())),
+            );
         }
 
         for c in s.chars() {
-            self.add_token(TokenType::String, AplType::Scalar(Scalar::String(c.to_string())));
+            self.add_token(
+                TokenType::String,
+                AplType::Scalar(Scalar::String(c.to_string())),
+            );
         }
 
         self.add(TokenType::RightParenthesis);

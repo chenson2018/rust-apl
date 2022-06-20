@@ -4,8 +4,8 @@ use crate::expr::Expr;
 use crate::token_type::TokenType;
 
 //use crate::apl_type::Array;
-use crate::apl_type::Scalar;
 use crate::apl_type::extract_scalar;
+use crate::apl_type::Scalar;
 
 use crate::primitives::dyadic::add;
 use crate::primitives::monadic::shape;
@@ -42,10 +42,10 @@ impl Interpreter {
             Expr::Array(ref t) => {
                 let res = t
                     .iter()
-                    .map(|x| extract_scalar(self.evaluate(x).unwrap()) )
+                    .map(|x| extract_scalar(self.evaluate(x).unwrap()))
                     .collect::<Vec<Scalar>>();
 
-                  Ok(AplType::Array(res))
+                Ok(AplType::Array(res))
             }
             Expr::Literal(ref t) => Ok(t.clone()),
             Expr::Grouping(ref expr) => self.evaluate(expr),
@@ -66,7 +66,7 @@ impl Interpreter {
             Expr::Monadic(ref op, ref right) => {
                 let right = self.evaluate(right)?;
 
-                let res =  match op.token {
+                let res = match op.token {
                     TokenType::Rho => shape(right),
                     _ => todo!("Monadic operator {:?}", op.token),
                 };
@@ -75,7 +75,6 @@ impl Interpreter {
                     Ok(value) => Ok(value),
                     Err(err) => Err(AplError::new(err.to_string(), 0)),
                 }
-    
             }
             Expr::Variable(t) => todo!("Primitive {:?} not implemented.", t.token),
         }

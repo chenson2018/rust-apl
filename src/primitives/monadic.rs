@@ -6,10 +6,7 @@ use crate::apl_type::Scalar;
 
 pub fn shape(right: AplType) -> Result<AplType, &'static str> {
     match right {
-        AplType::Enclose(r) => Ok(
-                                AplType::Array(
-                                    vec![ Scalar::Number(r.len() as f64)
-                                        ] )),
+        AplType::Enclose(r) => Ok(AplType::Array(vec![Scalar::Number(r.len() as f64)])),
         AplType::Name(_) => panic!("Function called on unevaluated name."),
         AplType::Scalar(_) => todo!(),
         AplType::Array(_) => todo!(),

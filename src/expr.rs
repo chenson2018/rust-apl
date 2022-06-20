@@ -11,7 +11,7 @@ pub enum Expr {
     Literal(AplType),
     Variable(Token),
     Enclose(Vec<Expr>),
-    Array(Vec<Expr>), 
+    Array(Vec<Expr>),
 }
 
 impl fmt::Display for Expr {

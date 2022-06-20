@@ -123,12 +123,11 @@ impl Parser {
             };
         }
 
-
         //println!("What it looks like before we maybe enclose");
         //println!("{:?}", v);
 
         let all_lit = v.iter().all(|s| matches!(s, Expr::Literal(_)));
-        
+
         if v.is_empty() {
             Err(AplError::new(
                 "Expected expression".to_string(),
@@ -136,7 +135,7 @@ impl Parser {
             ))
         } else if v.len() == 1 {
             Ok(v.clone().into_iter().next().unwrap())
-        } else if all_lit { 
+        } else if all_lit {
             Ok(Expr::Array(v.into_iter().rev().collect::<Vec<Expr>>()))
         } else {
             Ok(Expr::Enclose(v.into_iter().rev().collect::<Vec<Expr>>()))

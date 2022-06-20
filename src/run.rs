@@ -38,7 +38,6 @@ pub fn run(s: String, i: &mut Interpreter, verbose: bool) -> Result<AplType, Vec
 
     let ast_verified = ast.unwrap();
 
-
     // Interpreting
     let value = i.interpret(&ast_verified);
 
@@ -54,6 +53,6 @@ pub fn run(s: String, i: &mut Interpreter, verbose: bool) -> Result<AplType, Vec
         println!("Rust AST: {:?}\n", &ast_verified);
         println!("Evaluates to: {:?}\n", value_verified);
     }
-    
+
     Ok(value_verified)
 }

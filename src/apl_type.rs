@@ -10,8 +10,8 @@ pub enum AplType {
 
 #[derive(Debug, Clone)]
 pub enum Scalar {
-  Number(f64),
-  String(String),
+    Number(f64),
+    String(String),
 }
 
 // do this eventually???
@@ -22,9 +22,11 @@ pub enum Scalar {
 //}
 
 pub fn extract_scalar(apl: AplType) -> Scalar {
-  match apl { AplType::Scalar(x) => x, _ => panic!("extract_scalar received a non-scalar")}
+    match apl {
+        AplType::Scalar(x) => x,
+        _ => panic!("extract_scalar received a non-scalar"),
+    }
 }
-
 
 impl fmt::Display for Scalar {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -36,13 +38,15 @@ impl fmt::Display for Scalar {
 }
 
 impl PartialEq for Scalar {
-  fn eq(&self, other: &Scalar) -> bool {
-    match (self, other) {
-      (&Scalar::Number(ref s), Scalar::Number(ref o)) => (s == o),
-      (&Scalar::String(ref s), Scalar::String(ref o)) => (s == o),
-      (&Scalar::Number(_), &Scalar::String(_)) | (&Scalar::String(_), &Scalar::Number(_)) => false,
+    fn eq(&self, other: &Scalar) -> bool {
+        match (self, other) {
+            (&Scalar::Number(ref s), Scalar::Number(ref o)) => (s == o),
+            (&Scalar::String(ref s), Scalar::String(ref o)) => (s == o),
+            (&Scalar::Number(_), &Scalar::String(_)) | (&Scalar::String(_), &Scalar::Number(_)) => {
+                false
+            }
+        }
     }
-  }
 }
 
 impl PartialEq for AplType {
