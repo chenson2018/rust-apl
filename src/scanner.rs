@@ -1,5 +1,6 @@
 use std::io;
 
+use crate::apl_type::Scalar;
 use crate::apl_type::AplType;
 use crate::err::AplError;
 use crate::token::Token;
@@ -445,11 +446,11 @@ impl Scanner {
         self.add(TokenType::LeftParenthesis);
 
         if s.chars().count() == 0 {
-          self.add_token(TokenType::String, AplType::String("".to_string()));
+          self.add_token(TokenType::String, AplType::Scalar(Scalar::String("".to_string()))    );
         }
 
         for c in s.chars() {
-            self.add_token(TokenType::String, AplType::String(c.to_string()));
+            self.add_token(TokenType::String, AplType::Scalar(Scalar::String(c.to_string())));
         }
 
         self.add(TokenType::RightParenthesis);
@@ -473,7 +474,7 @@ impl Scanner {
             .collect::<String>();
 
         match s.parse::<f64>() {
-            Ok(n) => self.add_token(TokenType::Number, AplType::Number(n)),
+            Ok(n) => self.add_token(TokenType::Number, AplType::Scalar(Scalar::Number(n))),
             Err(e) => {
                 return Err(AplError::with_lower(
                     "Invalid number".to_string(),
