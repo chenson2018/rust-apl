@@ -1,4 +1,5 @@
 use crate::apl_type::AplArray;
+use crate::apl_type::AplEnclose;
 use crate::apl_type::AplType;
 use crate::apl_type::Scalar;
 
@@ -23,46 +24,82 @@ pub fn add(left: AplType, right: AplType) -> Result<AplType, &'static str> {
             Ok(AplType::Array(AplArray::from(res)))
         }
         (AplType::Array(l), AplType::Array(r)) => {
+            if l.shape != r.shape {
+                return Err("Incompatibile shapes");
+            }
+
             let res = ArrayBase::from(l) + ArrayBase::from(r);
             Ok(AplType::Array(AplArray::from(res)))
         }
         (AplType::Scalar(Scalar::Number(l)), AplType::Enclose(r)) => {
-            let res: Vec<AplType> = r
+            let shape = r.shape;
+
+            let values: Vec<AplType> = r
+                .values
                 .iter()
                 .map(|x| add(AplType::Scalar(Scalar::Number(l)), x.clone()).unwrap())
                 .collect();
-            Ok(AplType::Enclose(res))
+
+            Ok(AplType::Enclose(AplEnclose { values, shape }))
         }
         (AplType::Enclose(r), AplType::Scalar(Scalar::Number(l))) => {
-            let res: Vec<AplType> = r
+            let shape = r.shape;
+
+            let values: Vec<AplType> = r
+                .values
                 .iter()
                 .map(|x| add(AplType::Scalar(Scalar::Number(l)), x.clone()).unwrap())
                 .collect();
-            Ok(AplType::Enclose(res))
+
+            Ok(AplType::Enclose(AplEnclose { values, shape }))
         }
         (AplType::Enclose(r), AplType::Array(l)) => {
-            let res: Vec<AplType> = r
+            if l.shape != r.shape {
+                return Err("Incompatibile shapes");
+            }
+
+            let shape = r.shape;
+
+            let values: Vec<AplType> = r
+                .values
                 .iter()
                 .zip(l.values)
                 .map(|(x, y)| add(x.clone(), AplType::Scalar(y)).unwrap())
                 .collect();
-            Ok(AplType::Enclose(res))
+
+            Ok(AplType::Enclose(AplEnclose { values, shape }))
         }
         (AplType::Array(l), AplType::Enclose(r)) => {
-            let res: Vec<AplType> = r
+            if l.shape != r.shape {
+                return Err("Incompatibile shapes");
+            }
+
+            let shape = r.shape;
+
+            let values: Vec<AplType> = r
+                .values
                 .iter()
                 .zip(l.values)
                 .map(|(x, y)| add(x.clone(), AplType::Scalar(y)).unwrap())
                 .collect();
-            Ok(AplType::Enclose(res))
+
+            Ok(AplType::Enclose(AplEnclose { values, shape }))
         }
         (AplType::Enclose(l), AplType::Enclose(r)) => {
-            let res: Vec<AplType> = r
+            if l.shape != r.shape {
+                return Err("Incompatibile shapes");
+            }
+
+            let shape = r.shape;
+
+            let values: Vec<AplType> = r
+                .values
                 .iter()
-                .zip(l)
+                .zip(l.values)
                 .map(|(x, y)| add(x.clone(), y).unwrap())
                 .collect();
-            Ok(AplType::Enclose(res))
+
+            Ok(AplType::Enclose(AplEnclose { values, shape }))
         }
         _ => Err("+ (dyadic) can only take numeric arguments"),
     }

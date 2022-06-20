@@ -5,6 +5,7 @@ use crate::token_type::TokenType;
 
 use crate::apl_type::extract_scalar;
 use crate::apl_type::AplArray;
+use crate::apl_type::AplEnclose;
 use crate::apl_type::Scalar;
 
 use crate::primitives::dyadic::add;
@@ -33,11 +34,14 @@ impl Interpreter {
     fn evaluate(&mut self, e: &Expr) -> Result<AplType, AplError> {
         match e {
             Expr::Enclose(ref t) => {
-                let res = t
+                let shape = vec![t.len()];
+
+                let values = t
                     .iter()
                     .map(|x| self.evaluate(x).unwrap())
                     .collect::<Vec<AplType>>();
-                Ok(AplType::Enclose(res))
+
+                Ok(AplType::Enclose(AplEnclose { values, shape }))
             }
             Expr::Array(ref t) => {
                 let shape = vec![t.len()];

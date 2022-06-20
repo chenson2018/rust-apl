@@ -11,7 +11,7 @@ pub enum AplType {
     Scalar(Scalar),
     Name(String),
     Array(AplArray),
-    Enclose(Vec<AplType>),
+    Enclose(AplEnclose),
 }
 
 #[derive(Debug, Clone)]
@@ -26,6 +26,12 @@ pub enum Scalar {
 #[derive(Debug, Clone)]
 pub struct AplArray {
     pub values: Vec<Scalar>,
+    pub shape: Vec<usize>,
+}
+
+#[derive(Debug, Clone)]
+pub struct AplEnclose {
+    pub values: Vec<AplType>,
     pub shape: Vec<usize>,
 }
 
@@ -86,7 +92,7 @@ impl PartialEq for AplType {
     fn eq(&self, other: &AplType) -> bool {
         match (self, other) {
             (&AplType::Scalar(ref s), &AplType::Scalar(ref o)) => (s == o),
-            (&AplType::Enclose(ref s), &AplType::Enclose(ref o)) => (s == o),
+            (&AplType::Enclose(ref s), &AplType::Enclose(ref o)) => (s.values == o.values),
             (&AplType::Array(ref s), &AplType::Array(ref o)) => (s.values == o.values),
             _ => false, // Name is left out here... something feels odd about this...
         }
@@ -100,7 +106,7 @@ impl fmt::Display for AplType {
             AplType::Name(ref b) => write!(f, "{}", b),
             AplType::Enclose(ref vec) => {
                 write!(f, "[")?;
-                for v in vec {
+                for v in &vec.values {
                     write!(f, " {} ", v)?;
                 }
                 write!(f, "]")?;
