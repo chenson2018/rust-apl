@@ -3,8 +3,8 @@ use crate::err::AplError;
 use crate::expr::Expr;
 use crate::token_type::TokenType;
 
-//use crate::apl_type::Array;
 use crate::apl_type::extract_scalar;
+use crate::apl_type::AplArray;
 use crate::apl_type::Scalar;
 
 use crate::primitives::dyadic::add;
@@ -40,12 +40,14 @@ impl Interpreter {
                 Ok(AplType::Enclose(res))
             }
             Expr::Array(ref t) => {
-                let res = t
+                let shape = vec![t.len()];
+
+                let values = t
                     .iter()
                     .map(|x| extract_scalar(self.evaluate(x).unwrap()))
                     .collect::<Vec<Scalar>>();
 
-                Ok(AplType::Array(res))
+                Ok(AplType::Array(AplArray { values, shape }))
             }
             Expr::Literal(ref t) => Ok(t.clone()),
             Expr::Grouping(ref expr) => self.evaluate(expr),

@@ -1,10 +1,16 @@
+use ndarray::Array;
+use ndarray::ArrayBase;
+use ndarray::Dim;
+use ndarray::IxDynImpl;
+use ndarray::OwnedRepr;
+
 use std::fmt;
 
 #[derive(Debug, Clone)]
 pub enum AplType {
     Scalar(Scalar),
     Name(String),
-    Array(Vec<Scalar>),
+    Array(AplArray),
     Enclose(Vec<AplType>),
 }
 
@@ -14,17 +20,44 @@ pub enum Scalar {
     String(String),
 }
 
-// do this eventually???
-//#[derive(Debug, Clone)]
-//pub struct Array {
-//  pub values: Vec<Scalar>,
-//  pub shape: Vec<usize>,
-//}
+// TODO: this same thing needs to be done for Enclose!!!
+// TODO: handle getting AplArray.shape as a valid AplType (usize is the problem)
+
+#[derive(Debug, Clone)]
+pub struct AplArray {
+    pub values: Vec<Scalar>,
+    pub shape: Vec<usize>,
+}
+
+// these are some helpers for converting back/forth from interpreted types to ndarrays
 
 pub fn extract_scalar(apl: AplType) -> Scalar {
     match apl {
         AplType::Scalar(x) => x,
         _ => panic!("extract_scalar received a non-scalar"),
+    }
+}
+
+pub fn extract_f64(apl: Vec<Scalar>) -> Vec<f64> {
+    apl.iter()
+        .map(|x| match *x {
+            Scalar::Number(x) => x,
+            _ => panic!("extract_scalar received a non-scalar"),
+        })
+        .collect::<Vec<f64>>()
+}
+
+impl From<AplArray> for ArrayBase<OwnedRepr<f64>, Dim<IxDynImpl>> {
+    fn from(v: AplArray) -> Self {
+        Array::from_shape_vec(v.shape, extract_f64(v.values)).unwrap()
+    }
+}
+
+impl From<ArrayBase<OwnedRepr<f64>, Dim<IxDynImpl>>> for AplArray {
+    fn from(v: ArrayBase<OwnedRepr<f64>, Dim<IxDynImpl>>) -> Self {
+        let shape = v.shape().to_vec();
+        let values = v.into_iter().map(Scalar::Number).collect::<Vec<Scalar>>();
+        AplArray { values, shape }
     }
 }
 
@@ -54,7 +87,7 @@ impl PartialEq for AplType {
         match (self, other) {
             (&AplType::Scalar(ref s), &AplType::Scalar(ref o)) => (s == o),
             (&AplType::Enclose(ref s), &AplType::Enclose(ref o)) => (s == o),
-            (&AplType::Array(ref s), &AplType::Array(ref o)) => (s == o),
+            (&AplType::Array(ref s), &AplType::Array(ref o)) => (s.values == o.values),
             _ => false, // Name is left out here... something feels odd about this...
         }
     }
@@ -75,7 +108,7 @@ impl fmt::Display for AplType {
             }
             AplType::Array(ref vec) => {
                 write!(f, "[")?;
-                for v in vec {
+                for v in &vec.values {
                     write!(f, " {} ", v)?;
                 }
                 write!(f, "]")?;
