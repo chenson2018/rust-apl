@@ -15,9 +15,17 @@ mod test {
 
     #[test]
     fn add() {
+        // nine combos of scalar, vector (soon array!), enclose
         apl_assert("1+1", "2");
-        apl_assert("5+1 2 3", "6 7 8");
+        apl_assert("1+1 2 3", "2 3 4");
+        apl_assert("1+(1 2)(3 4)", "(2 3)(4 5)");
+
+        apl_assert("1 2 3+1", "2 3 4");
         apl_assert("1 2 3+4 5 6", "5 7 9");
-        //apl_assert("(1 (2 3) (4 5))+(1 2 (3 4))", "2 (4 5) (7 9)");
+        apl_assert("(1 2 3)+(1 2)(3 4)(5 6)", "(2 3)(5 6)(8 9)");
+
+        apl_assert("(1 2)(3 4)+1", "(2 3)(4 5)");
+        apl_assert("(1 2)(3 4)(5 6)+1 2 3", "(2 3)(5 6)(8 9)");
+        apl_assert("(1 2)(3 4)+(5 6)(7 8)", "(6 8)(10 12)");
     }
 }
