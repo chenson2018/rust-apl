@@ -1,3 +1,4 @@
+use crate::apl_type::AplEnclose;
 use crate::apl_type::AplType;
 //use crate::apl_type::Scalar;
 
@@ -12,4 +13,19 @@ pub fn shape(_right: AplType) -> Result<AplType, &'static str> {
     //        AplType::Name(r) => Err("Undefined name {}", r),
     //        AplType::Scalar(_) => todo!(),
     //    }
+}
+
+pub fn enclose(right: AplType) -> Result<AplType, &'static str> {
+    match right {
+        AplType::Name(_) => panic!("Call on unevaluated name."),
+        AplType::Scalar(_) => Ok(right),
+        AplType::Enclose(x) => Ok(AplType::Enclose(AplEnclose {
+            values: vec![AplType::Enclose(x)],
+            shape: vec![],
+        })),
+        AplType::Array(x) => Ok(AplType::Enclose(AplEnclose {
+            values: vec![AplType::Array(x)],
+            shape: vec![],
+        })),
+    }
 }

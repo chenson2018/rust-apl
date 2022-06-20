@@ -37,4 +37,19 @@ mod test {
         // should fail for incompatible sizes
         assert_err("1 2+1 2 3");
     }
+
+    #[test]
+    fn enclose() {
+        // a bit hard to test, because no parsing way to enclose a single array...
+
+        // no change for these scalars
+        apl_assert("⊂1", "1");
+        apl_assert("⊂'t'", "'t'");
+    }
+
+    // check enclose broadcating
+    #[test]
+    fn enclose_broadcast() {
+        apl_assert("1 2 3+⊂4 5 6", "(5 6 7)(6 7 8)(7 8 9)");
+    }
 }

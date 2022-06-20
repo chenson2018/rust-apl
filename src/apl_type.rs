@@ -105,11 +105,11 @@ impl fmt::Display for AplType {
             AplType::Scalar(ref s) => write!(f, "{}", s),
             AplType::Name(ref b) => write!(f, "{}", b),
             AplType::Enclose(ref vec) => {
-                write!(f, "[")?;
+                write!(f, "<<")?;
                 for v in &vec.values {
                     write!(f, " {} ", v)?;
                 }
-                write!(f, "]")?;
+                write!(f, ">>")?;
                 Ok(())
             }
             AplType::Array(ref vec) => {

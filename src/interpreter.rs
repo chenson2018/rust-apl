@@ -8,8 +8,8 @@ use crate::apl_type::AplArray;
 use crate::apl_type::AplEnclose;
 use crate::apl_type::Scalar;
 
-use crate::primitives::dyadic::add;
-use crate::primitives::monadic::shape;
+use crate::primitives::dyadic::*;
+use crate::primitives::monadic::*;
 
 #[derive(Clone)]
 pub struct Interpreter {}
@@ -74,6 +74,7 @@ impl Interpreter {
 
                 let res = match op.token {
                     TokenType::Rho => shape(right),
+                    TokenType::LeftShoe => enclose(right),
                     _ => todo!("Monadic operator {:#?}", op.token),
                 };
 

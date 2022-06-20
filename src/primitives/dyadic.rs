@@ -2,6 +2,7 @@ use crate::apl_type::AplArray;
 use crate::apl_type::AplEnclose;
 use crate::apl_type::AplType;
 use crate::apl_type::Scalar;
+use std::iter;
 
 use ndarray::ArrayBase;
 
@@ -54,42 +55,54 @@ pub fn add(left: AplType, right: AplType) -> Result<AplType, &'static str> {
             Ok(AplType::Enclose(AplEnclose { values, shape }))
         }
         (AplType::Enclose(r), AplType::Array(l)) => {
-            if l.shape != r.shape {
-                return Err("Incompatibile shapes");
+            if r.values.len() == 1 {
+                let shape = l.shape.clone();
+                let mut rep = iter::repeat(r.values[0].clone());
+
+                let values: Vec<AplType> = l
+                    .values
+                    .iter()
+                    .map(|x| add(AplType::Scalar(x.clone()), rep.next().unwrap()).unwrap())
+                    .collect();
+
+                Ok(AplType::Enclose(AplEnclose { values, shape }))
+            } else {
+                let shape = r.shape;
+
+                let values: Vec<AplType> = r
+                    .values
+                    .iter()
+                    .zip(l.values)
+                    .map(|(x, y)| add(x.clone(), AplType::Scalar(y)).unwrap())
+                    .collect();
+                Ok(AplType::Enclose(AplEnclose { values, shape }))
             }
-
-            let shape = r.shape;
-
-            let values: Vec<AplType> = r
-                .values
-                .iter()
-                .zip(l.values)
-                .map(|(x, y)| add(x.clone(), AplType::Scalar(y)).unwrap())
-                .collect();
-
-            Ok(AplType::Enclose(AplEnclose { values, shape }))
         }
         (AplType::Array(l), AplType::Enclose(r)) => {
-            if l.shape != r.shape {
-                return Err("Incompatibile shapes");
+            if r.values.len() == 1 {
+                let shape = l.shape.clone();
+                let mut rep = iter::repeat(r.values[0].clone());
+
+                let values: Vec<AplType> = l
+                    .values
+                    .iter()
+                    .map(|x| add(AplType::Scalar(x.clone()), rep.next().unwrap()).unwrap())
+                    .collect();
+
+                Ok(AplType::Enclose(AplEnclose { values, shape }))
+            } else {
+                let shape = r.shape;
+
+                let values: Vec<AplType> = r
+                    .values
+                    .iter()
+                    .zip(l.values)
+                    .map(|(x, y)| add(x.clone(), AplType::Scalar(y)).unwrap())
+                    .collect();
+                Ok(AplType::Enclose(AplEnclose { values, shape }))
             }
-
-            let shape = r.shape;
-
-            let values: Vec<AplType> = r
-                .values
-                .iter()
-                .zip(l.values)
-                .map(|(x, y)| add(x.clone(), AplType::Scalar(y)).unwrap())
-                .collect();
-
-            Ok(AplType::Enclose(AplEnclose { values, shape }))
         }
         (AplType::Enclose(l), AplType::Enclose(r)) => {
-            if l.shape != r.shape {
-                return Err("Incompatibile shapes");
-            }
-
             let shape = r.shape;
 
             let values: Vec<AplType> = r

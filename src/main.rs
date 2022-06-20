@@ -18,7 +18,7 @@ struct Args {
     path: Option<String>,
 
     /// Print Interpreter Debugging
-    #[clap(short, long, action, default_value_t = true)]
+    #[clap(short, long, action, default_value_t = false)]
     verbose: bool,
 }
 
