@@ -12,7 +12,7 @@ pub enum AplType {
     Name(String),
     Array(AplArray),
     Enclose(AplEnclose),
-    Null
+    Null,
 }
 
 #[derive(Debug, Clone)]

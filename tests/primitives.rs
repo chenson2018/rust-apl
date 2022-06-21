@@ -19,6 +19,21 @@ mod test {
         assert!(value.is_err())
     }
 
+    fn assert_sequence(left: Vec<&str>, right: &str) {
+        let mut interpreter = Interpreter::new();
+        let mut results = Vec::new();
+
+        for l in left {
+            let s = format!("{}\n", l.to_string());
+            results.push(run(s, &mut interpreter, false).unwrap())
+        }
+
+        let r = format!("{}\n", right.to_string());
+        let r_val = run(r, &mut Interpreter::new(), false).unwrap();
+
+        assert_eq!(*results.last().unwrap(), r_val);
+    }
+
     #[test]
     fn add() {
         // nine combos of scalar, vector (soon array!), enclose
@@ -53,9 +68,9 @@ mod test {
         apl_assert("1 2 3+⊂4 5 6", "(5 6 7)(6 7 8)(7 8 9)");
     }
 
-    // check enclose broadcating
     #[test]
-    fn enclose_broadcast() {
-        apl_assert("1 2 3+⊂4 5 6", "(5 6 7)(6 7 8)(7 8 9)");
+    fn assignment() {
+        assert_sequence(vec!["a←1", "a"], "1");
+        assert_sequence(vec!["a←1", "a+1"], "1+1");
     }
 }

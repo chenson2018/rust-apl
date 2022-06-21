@@ -67,22 +67,20 @@ impl Interpreter {
 
                 let res = match op.token {
                     // TODO: support variable modification
-                    TokenType::LeftArrow => { 
-                          match left.borrow() {
-                            Expr::Variable(t) => {
-                                self.env.define(&t.lexeme,right);
-                                Ok(AplType::Null)
-                            },
-                            _           => Err("Attempt to modify constant.")
-                          }
-
-                      },
+                    TokenType::LeftArrow => match left.borrow() {
+                        Expr::Variable(t) => {
+                            self.env.define(&t.lexeme, right);
+                            Ok(AplType::Null)
+                        }
+                        _ => Err("Attempt to modify constant."),
+                    },
                     _ => {
                         let left = self.evaluate(left)?;
                         match op.token {
-                          TokenType::Plus => add(left, right),
-                          _ => todo!("Dyadic operator {:#?}", op.token),
-                    }},
+                            TokenType::Plus => add(left, right),
+                            _ => todo!("Dyadic operator {:#?}", op.token),
+                        }
+                    }
                 };
 
                 match res {
