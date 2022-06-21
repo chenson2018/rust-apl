@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["AplType",""],["Scalar",""]],"fn":[["extract_f64",""],["extract_scalar",""]],"struct":[["AplArray",""],["AplEnclose",""]]});

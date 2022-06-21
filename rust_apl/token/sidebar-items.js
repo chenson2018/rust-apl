@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["TokenType","An enum for representing the allowed tokens in APL."]],"struct":[["Token",""]]});
