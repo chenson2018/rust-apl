@@ -22,7 +22,7 @@ struct Args {
     path: Option<String>,
 
     /// Print Interpreter Debugging
-    #[clap(short, long, action, default_value_t = true)]
+    #[clap(short, long, action, default_value_t = false)]
     verbose: bool,
 }
 
@@ -57,7 +57,7 @@ fn main() {
             for l in lines {
                 // there HAS to be a better way to read and keep new lines
                 let mut s = l.unwrap();
-                s.push_str("\n");
+                s.push('\n');
 
                 match run(s, &mut interpreter, args.verbose) {
                     Ok(value) => println!("{}", value),

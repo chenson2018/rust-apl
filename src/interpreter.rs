@@ -104,10 +104,7 @@ impl Interpreter {
             }
             Expr::Variable(t) => match self.env.get(&t.lexeme) {
                 Some(r) => Ok(r),
-                None => Err(AplError::new(
-                    "Variable not found".to_string(),
-                    t.line.clone(),
-                )),
+                None => Err(AplError::new("Variable not found".to_string(), t.line)),
             },
         }
     }

@@ -4,8 +4,8 @@ mod test {
     use rust_apl::run::run;
 
     fn apl_assert(left: &str, right: &str) {
-        let l = format!("{}\n", left.to_string());
-        let r = format!("{}\n", right.to_string());
+        let l = format!("{}\n", left);
+        let r = format!("{}\n", right);
 
         assert_eq!(
             run(l, &mut Interpreter::new(), false).unwrap(),
@@ -14,7 +14,7 @@ mod test {
     }
 
     fn assert_err(expr: &str) {
-        let e = format!("{}\n", expr.to_string());
+        let e = format!("{}\n", expr);
         let value = run(e, &mut Interpreter::new(), false);
         assert!(value.is_err())
     }
@@ -24,11 +24,11 @@ mod test {
         let mut results = Vec::new();
 
         for l in left {
-            let s = format!("{}\n", l.to_string());
+            let s = format!("{}\n", l);
             results.push(run(s, &mut interpreter, false).unwrap())
         }
 
-        let r = format!("{}\n", right.to_string());
+        let r = format!("{}\n", right);
         let r_val = run(r, &mut Interpreter::new(), false).unwrap();
 
         assert_eq!(*results.last().unwrap(), r_val);

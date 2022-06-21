@@ -8,6 +8,12 @@ pub struct Environment {
     pub enclosing: Option<Box<Environment>>,
 }
 
+impl Default for Environment {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Environment {
     pub fn new() -> Environment {
         Environment {
@@ -23,7 +29,7 @@ impl Environment {
         }
     }
 
-    pub fn extend(&mut self, other: Box<Environment>) {
+    pub fn extend(&mut self, other: Environment) {
         self.values.extend(other.values);
     }
 
@@ -43,12 +49,10 @@ impl Environment {
         let res = self.values.get(&name.to_string());
         if res.is_some() {
             res.cloned()
+        } else if let Some(ref enclosing) = self.enclosing {
+            enclosing.get(name)
         } else {
-            if let Some(ref enclosing) = self.enclosing {
-                enclosing.get(&name.to_string())
-            } else {
-                None
-            }
+            None
         }
     }
 
@@ -57,7 +61,7 @@ impl Environment {
             true => true,
             false => {
                 if let Some(ref enclosing) = self.enclosing {
-                    enclosing.contains(&name)
+                    enclosing.contains(name)
                 } else {
                     false
                 }
