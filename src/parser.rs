@@ -82,7 +82,7 @@ impl Parser {
             let op = self.previous();
             let right = self.primary();
 
-            // this is not good....
+            // TODO: this is not good....
             match right {
                 Ok(r) => {
                     e = Expr::Dyadic(Rc::new(r), op, Rc::new(e));

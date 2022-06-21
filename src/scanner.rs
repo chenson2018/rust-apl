@@ -322,7 +322,6 @@ impl Scanner {
             '}' => {
                 self.add(TokenType::RightBrace);
             }
-            // strings (which is reall a vector of char scalars, may need to come back to fix this)
             '\'' => {
                 if let Err(e) = self.string() {
                     errs.push(e);
@@ -495,7 +494,7 @@ impl Scanner {
     }
 
     fn identifier(&mut self) {
-        // need to come back and change these rules to match APL
+        // TODO: need to come back and change these rules to match APL
         while self.peek().is_alphanumeric() || self.peek() == '_' || self.peek() == '-' {
             self.advance();
         }
