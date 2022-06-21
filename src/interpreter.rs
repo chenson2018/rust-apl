@@ -7,12 +7,17 @@ use crate::apl_type::extract_scalar;
 use crate::apl_type::AplArray;
 use crate::apl_type::AplEnclose;
 use crate::apl_type::Scalar;
+use crate::environment::Environment;
 
 use crate::primitives::dyadic::*;
 use crate::primitives::monadic::*;
 
+use std::borrow::Borrow;
+
 #[derive(Clone)]
-pub struct Interpreter {}
+pub struct Interpreter {
+    pub env: Box<Environment>,
+}
 
 impl Default for Interpreter {
     fn default() -> Self {
@@ -24,7 +29,9 @@ impl Default for Interpreter {
 
 impl Interpreter {
     pub fn new() -> Interpreter {
-        Interpreter {}
+        Interpreter {
+            env: Box::new(Environment::new()),
+        }
     }
 
     pub fn interpret(&mut self, e: &Expr) -> Result<AplType, AplError> {
@@ -56,12 +63,26 @@ impl Interpreter {
             Expr::Literal(ref t) => Ok(t.clone()),
             Expr::Grouping(ref expr) => self.evaluate(expr),
             Expr::Dyadic(ref left, ref op, ref right) => {
-                let left = self.evaluate(left)?;
                 let right = self.evaluate(right)?;
 
                 let res = match op.token {
-                    TokenType::Plus => add(left, right),
-                    _ => todo!("Dyadic operator {:#?}", op.token),
+                    // TODO: support variable modification
+                    TokenType::LeftArrow => { 
+                          match left.borrow() {
+                            Expr::Variable(t) => {
+                                self.env.define(&t.lexeme,right);
+                                Ok(AplType::Null)
+                            },
+                            _           => Err("Attempt to modify constant.")
+                          }
+
+                      },
+                    _ => {
+                        let left = self.evaluate(left)?;
+                        match op.token {
+                          TokenType::Plus => add(left, right),
+                          _ => todo!("Dyadic operator {:#?}", op.token),
+                    }},
                 };
 
                 match res {
@@ -83,7 +104,13 @@ impl Interpreter {
                     Err(err) => Err(AplError::new(err.to_string(), 0)),
                 }
             }
-            Expr::Variable(t) => todo!("Primitive {:#?} not implemented.", t.token),
+            Expr::Variable(t) => match self.env.get(&t.lexeme) {
+                Some(r) => Ok(r),
+                None => Err(AplError::new(
+                    "Variable not found".to_string(),
+                    t.line.clone(),
+                )),
+            },
         }
     }
 }

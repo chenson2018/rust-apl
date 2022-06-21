@@ -2,8 +2,12 @@
 use clap::Parser;
 use std::fs::File;
 use std::io;
-use std::io::Read;
 use std::io::Write;
+
+use std::error::Error;
+use std::io::prelude::*;
+use std::io::BufReader;
+use std::path::Path;
 
 use rust_apl::interpreter::Interpreter;
 use rust_apl::run::run;
@@ -18,7 +22,7 @@ struct Args {
     path: Option<String>,
 
     /// Print Interpreter Debugging
-    #[clap(short, long, action, default_value_t = false)]
+    #[clap(short, long, action, default_value_t = true)]
     verbose: bool,
 }
 
@@ -31,12 +35,35 @@ fn main() {
         // if a path is provided, execute that file
         // currently only works for a single line!
         Some(p) => {
-            let mut buffer = String::new();
-            File::open(p).unwrap().read_to_string(&mut buffer).unwrap();
-            match run(buffer, &mut interpreter, args.verbose) {
-                Ok(value) => println!("{}", value),
-                Err(err) => println!("{:#?}", err),
+            // Create a path to the desired file
+            let path = Path::new(&p);
+            let display = path.display();
+
+            // Open the path in read-only mode, returns `io::Result<File>`
+            let file = match File::open(&path) {
+                // The `description` method of `io::Error` returns a string that describes the error
+                Err(why) => panic!(
+                    "couldn't open {}: {}",
+                    display,
+                    <dyn Error>::to_string(&why)
+                ),
+                Ok(file) => file,
             };
+
+            // Collect all lines into a vector
+            let reader = BufReader::new(file);
+            let lines: Vec<_> = reader.lines().collect();
+
+            for l in lines {
+                // there HAS to be a better way to read and keep new lines
+                let mut s = l.unwrap();
+                s.push_str("\n");
+
+                match run(s, &mut interpreter, args.verbose) {
+                    Ok(value) => println!("{}", value),
+                    Err(err) => println!("{:#?}", err),
+                };
+            }
         }
 
         // otherwise enter an interactive session

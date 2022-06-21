@@ -18,6 +18,7 @@ pub fn shape(_right: AplType) -> Result<AplType, &'static str> {
 pub fn enclose(right: AplType) -> Result<AplType, &'static str> {
     match right {
         AplType::Name(_) => panic!("Call on unevaluated name."),
+        AplType::Null => panic!("Call on Null"),
         AplType::Scalar(_) => Ok(right),
         AplType::Enclose(x) => Ok(AplType::Enclose(AplEnclose {
             values: vec![AplType::Enclose(x)],

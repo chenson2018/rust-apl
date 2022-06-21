@@ -12,6 +12,7 @@ pub enum AplType {
     Name(String),
     Array(AplArray),
     Enclose(AplEnclose),
+    Null
 }
 
 #[derive(Debug, Clone)]
@@ -102,6 +103,7 @@ impl PartialEq for AplType {
 impl fmt::Display for AplType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
+            AplType::Null => Ok(()),
             AplType::Scalar(ref s) => write!(f, "{}", s),
             AplType::Name(ref b) => write!(f, "{}", b),
             AplType::Enclose(ref vec) => {

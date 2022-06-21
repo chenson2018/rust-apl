@@ -50,7 +50,6 @@ impl Parser {
 
     fn peek(&mut self) -> Token {
         self.tokens[self.current].clone()
-        // This probably shouldn't clone, but im tired AND lazy.
     }
 
     fn previous(&mut self) -> Token {
@@ -58,7 +57,7 @@ impl Parser {
     }
 
     fn at_end(&mut self) -> bool {
-        self.peek().token == TokenType::Eof
+        self.peek().token == TokenType::Newline
     }
 
     pub fn parse(&mut self) -> Result<Expr, AplError> {
@@ -78,6 +77,7 @@ impl Parser {
             TokenType::Plus,
             TokenType::Rho,
             TokenType::LeftShoe,
+            TokenType::LeftArrow,
         ]) {
             let op = self.previous();
             let right = self.primary();

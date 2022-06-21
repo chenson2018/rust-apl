@@ -332,6 +332,7 @@ impl Scanner {
             // end of line
             '\n' => {
                 self.line += 1;
+                self.add(TokenType::Newline);
             }
 
             // whitespace
@@ -387,12 +388,12 @@ impl Scanner {
                 failed = true;
             }
         }
-        self.tokens.push(Token {
-            token: TokenType::Eof,
-            lexeme: "".to_string(),
-            line: self.line,
-            literal: None,
-        });
+        //        self.tokens.push(Token {
+        //            token: TokenType::Eof,
+        //            lexeme: "".to_string(),
+        //            line: self.line,
+        //            literal: None,
+        //        });
 
         // transformation to reverse each line
         let mut line_counter = 0;
