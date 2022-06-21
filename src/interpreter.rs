@@ -1,7 +1,7 @@
 use crate::apl_type::AplType;
 use crate::err::AplError;
 use crate::expr::Expr;
-use crate::token_type::TokenType;
+use crate::token::TokenType;
 
 use crate::apl_type::extract_scalar;
 use crate::apl_type::AplArray;

@@ -4,7 +4,7 @@ use crate::apl_type::AplType;
 use crate::apl_type::Scalar;
 use crate::err::AplError;
 use crate::token::Token;
-use crate::token_type::TokenType;
+use crate::token::TokenType;
 
 #[derive(Debug, Clone)]
 pub struct Scanner {

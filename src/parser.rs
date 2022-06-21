@@ -1,7 +1,6 @@
 use crate::err::AplError;
 use crate::expr::Expr;
-use crate::token::Token;
-use crate::token_type::TokenType;
+use crate::token::{Token, TokenType};
 
 use std::rc::Rc;
 
