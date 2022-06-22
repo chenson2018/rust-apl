@@ -30,29 +30,13 @@ jobs:
   doc:
     name: GitHub Pages
     runs-on: ubuntu-latest
-
     steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v1
-
-        - name: Install Rust toolchain
-          uses: actions-rs/toolchain@v1
-          with:
-            toolchain: stable
-            profile: minimal
-            override: true
-            components: rustfmt, rust-src
-
-        - name: Build Documentation
-          uses: actions-rs/cargo@v1
-          with:
-            command: doc
-            args: --all --no-deps --document-private-items
-        
-        - name: Deploy Documentation
-          uses: peaceiris/actions-gh-pages@v3
-          with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            publish_branch: gh-pages
-            publish_dir: ./target/doc
-            keep_files: true
+      - uses: actions/checkout@v1
+      - uses: dtolnay/rust-toolchain@1.61.0 
+      - run: cargo doc --no-deps --document-private-items
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./target/doc
+          keep_files: true
