@@ -28,7 +28,7 @@
 //! scanning, performed in this crate by [scanner::Scanner] to produce a
 //! vector of [token::Token].
 //!
-//! TODO: put an example
+//! TODO: put an example here
 //!
 //! ## Parsing
 //!
