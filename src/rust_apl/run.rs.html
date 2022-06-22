@@ -61,6 +61,7 @@
 <span id="56">56</span>
 <span id="57">57</span>
 <span id="58">58</span>
+<span id="59">59</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::apl_type::AplType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::err::AplError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::interpreter::Interpreter</span>;
@@ -69,6 +70,7 @@
 <span class="kw">use</span> <span class="ident">std::io</span>;
 <span class="kw">use</span> <span class="ident">std::io::Write</span>;
 
+<span class="doccomment">/// Given an [Interpreter](crate::interpreter::Interpreter), evaluate a given string.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="ident">s</span>: <span class="ident">String</span>, <span class="ident">i</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Interpreter</span>, <span class="ident">verbose</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AplType</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AplError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">io::stdout</span>().<span class="ident">flush</span>().<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scanner</span> <span class="op">=</span> <span class="ident">Scanner::new</span>(<span class="ident">s</span>);

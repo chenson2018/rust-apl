@@ -151,23 +151,56 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::err::AplError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::expr::Expr</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::token</span>::{<span class="ident">Token</span>, <span class="ident">TokenType</span>};
 
 <span class="kw">use</span> <span class="ident">std::rc::Rc</span>;
 
+<span class="doccomment">/// A struct representing a parser. This operates much like</span>
+<span class="doccomment">/// [rust_apl::scanner::Scanner](crate::scanner::Scanner), but instead of transforming raw</span>
+<span class="doccomment">/// characters into tokens, this takes those tokens and builds a tree representing an expression.</span>
+
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Parser</span> {
+    <span class="doccomment">/// index of self.tokens that the parser is examining</span>
     <span class="ident">current</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// vector of tokens, as received by [a Scanner](crate::scanner::Scanner)</span>
     <span class="ident">tokens</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Parser</span> {
+    <span class="doccomment">/// initialize a new parser</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tokens</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&gt;</span>) -&gt; <span class="ident">Parser</span> {
         <span class="ident">Parser</span> { <span class="ident">current</span>: <span class="number">0</span>, <span class="ident">tokens</span> }
     }
 
-    <span class="comment">// Helper methods</span>
+    <span class="doccomment">/// if the current token matches any of `types`, advance the parser</span>
     <span class="kw">fn</span> <span class="ident">match_t</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TokenType</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">for</span> <span class="ident">t</span> <span class="kw">in</span> <span class="ident">types</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">check</span>(<span class="ident">t</span>) {
@@ -178,6 +211,7 @@
         <span class="bool-val">false</span>
     }
 
+    <span class="doccomment">/// advance the parser a `Token` with the specified `TokenType` is found</span>
     <span class="kw">fn</span> <span class="ident">consume</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">TokenType</span>, <span class="ident">msg</span>: <span class="ident">String</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Token</span>, <span class="ident">AplError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">check</span>(<span class="ident">t</span>) {
             <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">advance</span>())
@@ -186,6 +220,7 @@
         }
     }
 
+    <span class="doccomment">/// check if the current `Token` has the specified `TokenType`</span>
     <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">TokenType</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">at_end</span>() {
             <span class="kw">return</span> <span class="bool-val">false</span>;
@@ -193,6 +228,7 @@
         <span class="self">self</span>.<span class="ident">peek</span>().<span class="ident">token</span> <span class="op">==</span> <span class="ident">t</span>
     }
 
+    <span class="doccomment">/// return the current `Token` and advance the parser one token</span>
     <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Token</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">at_end</span>() {
             <span class="self">self</span>.<span class="ident">current</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -200,26 +236,40 @@
         <span class="self">self</span>.<span class="ident">previous</span>()
     }
 
+    <span class="doccomment">/// return the current Token without advancing the scanner</span>
     <span class="kw">fn</span> <span class="ident">peek</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Token</span> {
         <span class="self">self</span>.<span class="ident">tokens</span>[<span class="self">self</span>.<span class="ident">current</span>].<span class="ident">clone</span>()
     }
 
+    <span class="doccomment">/// return the previous Token without advancing the scanner</span>
     <span class="kw">fn</span> <span class="ident">previous</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Token</span> {
         <span class="self">self</span>.<span class="ident">tokens</span>[<span class="self">self</span>.<span class="ident">current</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">clone</span>()
     }
 
+    <span class="doccomment">/// check if all tokens have been parsed</span>
     <span class="kw">fn</span> <span class="ident">at_end</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">peek</span>().<span class="ident">token</span> <span class="op">==</span> <span class="ident">TokenType::Newline</span>
     }
 
+    <span class="doccomment">/// parse `self.tokens` into an [expr::Expr](crate::expr::Expr)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span>, <span class="ident">AplError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">expression</span>()
     }
 
+    <span class="doccomment">/// parse an expression into an [expr::Expr](crate::expr::Expr)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that this function is called recursively, so that `self.parse`</span>
+    <span class="doccomment">/// requires only a single call.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expression</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span>, <span class="ident">AplError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">dyadic</span>()
     }
 
+    <span class="doccomment">/// parse a dyadic expression, i.e an expression with a function that takes a left and right argument</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// OR (split this later!!!)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// parse a monadic expression, i.e an expression with a function that only a right argument</span>
+    <span class="doccomment">///</span>
     <span class="kw">fn</span> <span class="ident">dyadic</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span>, <span class="ident">AplError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">primary</span>()<span class="question-mark">?</span>;
 
@@ -247,6 +297,8 @@
         <span class="prelude-val">Ok</span>(<span class="ident">e</span>)
     }
 
+    <span class="doccomment">/// loop, parsing literals (string, number, variable) or groupings (an expression bounded by</span>
+    <span class="doccomment">/// parenthesis) until the steam of tokens is exhausted.</span>
     <span class="kw">fn</span> <span class="ident">primary</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span>, <span class="ident">AplError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 

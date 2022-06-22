@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Scanner",""]]});
+initSidebarItems({"struct":[["Scanner","A struct representing a scanner. Note the difference between `self.current` and `self.start`. Suppose that we are scanning something like a number, string, or identifier (variable) that spans more than a single token. The index `self.start` will be the begining of the token, and after the scanner reaches the end of the token, `self.current` will be further ahead. We then add the token to `self.tokens` and set `self.start = self.current` before scanning the next token."]]});

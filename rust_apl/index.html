@@ -4,7 +4,7 @@
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../rust_apl/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"><a href="#">Crate rust_apl</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.1.0</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#modules">Modules</a></li></ul></div></section><div id="sidebar-vars" data-name="rust_apl" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../rust_apl/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">rust_apl</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/rust_apl/lib.rs.html#1-53">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This crate provides an interpreter for the language
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">rust_apl</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/rust_apl/lib.rs.html#1-66">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This crate provides an interpreter for the language
 <a href="https://en.wikipedia.org/wiki/APL_(programming_language)">APL</a></p>
 <p>This crate constructs an interpreter for the APL programming language, written in Rust.
 The primary inspiration is from Bob Nystrom’s excellent <a href="https://github.com/munificent/craftinginterpreters">Crafting Interpreters</a>.
@@ -12,21 +12,32 @@ I also have used a significant amount of code from <a href="https://github.com/e
 <p>The interpreter is relatively bare-bones. It supports a wide range of primitive glyphs,
 variables, and <a href="https://en.wikipedia.org/wiki/Direct_function#Dfns_versus_tradfns">direct
 functions</a>, but was created
-mostly as an instructive exercise for myself. In the sections below I have tried to provide
-sufficient documentation for anyone who might want to try something similar.</p>
-<h3 id="overview"><a href="#overview">Overview</a></h3>
-<p>To see the order that the interpreter uses, see <a href="run/fn.run.html">run.rs</a> and how it is used
-for the <a href="../src/rust_apl/main.rs.html">interpreter executable</a>. The below sections attempt to
-give a guide for each piece.</p>
-<h4 id="scanning"><a href="#scanning">Scanning</a></h4>
-<p>First, we enumerate the different types of tokens with <a href="token/enum.TokenType.html" title="token::TokenType">token::TokenType</a>.</p>
-<h4 id="parsing"><a href="#parsing">Parsing</a></h4>
+mostly as an instructive exercise for myself and is thus missing many features a full
+implementation would have. In this documentation I have tried to provide sufficient
+explanations for anyone who might want to try something similar.</p>
+<h3 id="executable"><a href="#executable">Executable</a></h3>
+<p>See <a href="run/fn.run.html">run.rs</a> for the execution order and note how it is used
+for the <a href="https://github.com/chenson2018/rust-apl/blob/main/src/main.rs">interpreter executable</a>.
+The below sections attempt to give a guide for each piece.</p>
+<h3 id="scanning"><a href="#scanning">Scanning</a></h3>
+<p>First, we enumerate the different types of tokens with <a href="token/enum.TokenType.html" title="token::TokenType">token::TokenType</a>, a representation of
+the groups of characters that have a syntactic meaning in our language. These can be a single
+character, like ‘+’, or a group of characters, like ‘1.25’ or ‘hello’. This process is called
+scanning, performed in this crate by <a href="scanner/struct.Scanner.html" title="scanner::Scanner">scanner::Scanner</a> to produce a
+vector of <a href="token/struct.Token.html" title="token::Token">token::Token</a>.</p>
+<p>TODO: put an example</p>
+<h3 id="parsing"><a href="#parsing">Parsing</a></h3>
+<p>Next, now that we have a series of token, we want to transform this into an expression. The key
+here is that any expression can be represented by a single tree like structure, called an
+<a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">abstact syntax tree</a>. This process is
+called parsing, performed in this crate by <a href="parser/struct.Parser.html" title="parser::Parser">parser::Parser</a> to produce a
+vector of <a href="expr/enum.Expr.html" title="expr::Expr">expr::Expr</a>. Continuing with the previous example:</p>
+<p>TODO: put an example</p>
+<h3 id="evaluation"><a href="#evaluation">Evaluation</a></h3>
 <p>TODO</p>
-<h4 id="evaluation"><a href="#evaluation">Evaluation</a></h4>
+<h3 id="variables"><a href="#variables">Variables</a></h3>
 <p>TODO</p>
-<h4 id="variables"><a href="#variables">Variables</a></h4>
-<p>TODO</p>
-<h4 id="functions"><a href="#functions">Functions</a></h4>
+<h3 id="functions"><a href="#functions">Functions</a></h3>
 <p>TODO</p>
 </div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="apl_type/index.html" title="rust_apl::apl_type mod">apl_type</a><span title="Restricted Visibility">&nbsp;🔒</span> </div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="environment/index.html" title="rust_apl::environment mod">environment</a><span title="Restricted Visibility">&nbsp;🔒</span> </div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="err/index.html" title="rust_apl::err mod">err</a><span title="Restricted Visibility">&nbsp;🔒</span> </div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="expr/index.html" title="rust_apl::expr mod">expr</a><span title="Restricted Visibility">&nbsp;🔒</span> </div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="interpreter/index.html" title="rust_apl::interpreter mod">interpreter</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="parser/index.html" title="rust_apl::parser mod">parser</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="primitives/index.html" title="rust_apl::primitives mod">primitives</a><span title="Restricted Visibility">&nbsp;🔒</span> </div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="run/index.html" title="rust_apl::run mod">run</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="scanner/index.html" title="rust_apl::scanner mod">scanner</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="token/index.html" title="rust_apl::token mod">token</a><span title="Restricted Visibility">&nbsp;🔒</span> </div><div class="item-right docblock-short"></div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="rust_apl" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>

@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["run",""]]});
+initSidebarItems({"fn":[["run","Given an Interpreter, evaluate a given string."]]});
