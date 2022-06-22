@@ -33,11 +33,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@1.61.0 
-      - run: |
-          cargo doc --document-private-items --no-deps
-          echo "<meta http-equiv=\"refresh\" content=\"0; url=rust_apl\">" > target/doc/index.html
-          cp -r target/doc ./docs
+      - run: cargo doc --document-private-items --no-deps
       - uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          with:
+            deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+            publish_branch: gh-pages
+            publish_dir: ./target/doc
+            keep_files: true
