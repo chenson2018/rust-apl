@@ -6,16 +6,29 @@ use crate::err::AplError;
 use crate::token::Token;
 use crate::token::TokenType;
 
+/// A struct representing a scanner. Note the difference between `self.current` and `self.start`.
+/// Suppose that we are scanning something like a number, string, or identifier (variable) that
+/// spans more than a single token. The index `self.start` will be the begining of the token, and
+/// after the scanner reaches the end of the token, `self.current` will be further ahead. We then
+/// add the token to `self.tokens` and set `self.start = self.current` before scanning the next
+/// token.
+
 #[derive(Debug, Clone)]
 pub struct Scanner {
+    /// raw character input of an APL program
     source: Vec<char>,
+    /// resulting tokens after scanning `self.source`
     pub tokens: Vec<Token>,
+    /// index of `self.source` that the scanner is examining
     current: usize,
+    /// current line number the scanner is examining
     line: usize,
+    /// starting index before scanner gets next token
     start: usize,
 }
 
 impl Scanner {
+    /// initialize a new scanner
     pub fn new(s: String) -> Scanner {
         Scanner {
             source: s.chars().collect::<Vec<char>>(),
@@ -26,12 +39,13 @@ impl Scanner {
         }
     }
 
+    /// return the current character and advance the scanner one character
     fn advance(&mut self) -> char {
         self.current += 1;
         self.source[self.current - 1]
     }
 
-    // add and add_token accomplish the same thing, but for literals vs non-literals
+    /// add a non-literal token to `self.tokens`
     fn add(&mut self, token: TokenType) {
         let lexeme = (&self.source[self.start..self.current])
             .iter()
@@ -45,6 +59,7 @@ impl Scanner {
         });
     }
 
+    /// add a literal token (string, number, or identifier) to `self.tokens`
     fn add_token(&mut self, token: TokenType, l: AplType) {
         let lexeme = (&self.source[self.start..self.current])
             .iter()
@@ -58,10 +73,12 @@ impl Scanner {
         });
     }
 
+    /// check if all characters have been scanned
     fn is_end(&self) -> bool {
         self.current >= self.source.len()
     }
 
+    /// scan a single token
     fn scan_token(&mut self) -> Result<(), Vec<AplError>> {
         let mut errs: Vec<AplError> = Vec::new();
         let mut failed = false;
@@ -360,6 +377,7 @@ impl Scanner {
         }
     }
 
+    /// return the current character without advancing the scanner
     fn peek(&mut self) -> char {
         if self.is_end() {
             '\0'
@@ -368,6 +386,7 @@ impl Scanner {
         }
     }
 
+    /// return the following character without advancing the scanner
     fn peek_next(&mut self) -> char {
         if self.current + 1 >= self.source.len() {
             '\0'
@@ -376,6 +395,7 @@ impl Scanner {
         }
     }
 
+    /// scan tokens until past all of `self.tokens`
     pub fn scan(&mut self) -> Result<(), Vec<AplError>> {
         let mut errors: Vec<AplError> = Vec::new();
         let mut failed = false;
@@ -420,6 +440,7 @@ impl Scanner {
         }
     }
 
+    /// scan a string
     fn string(&mut self) -> Result<(), AplError> {
         while self.peek() != '\'' && !(self.is_end()) {
             if self.peek() == '\n' {
@@ -464,6 +485,7 @@ impl Scanner {
         Ok(())
     }
 
+    /// scan a number
     fn number(&mut self) -> Result<(), AplError> {
         while self.peek().is_ascii_digit() {
             self.advance();
@@ -493,6 +515,7 @@ impl Scanner {
         Ok(())
     }
 
+    /// scan an identifier
     fn identifier(&mut self) {
         // TODO: need to come back and change these rules to match APL
         while self.peek().is_alphanumeric() || self.peek() == '_' || self.peek() == '-' {

@@ -6,6 +6,7 @@ use crate::scanner::Scanner;
 use std::io;
 use std::io::Write;
 
+/// Given an [Interpreter](crate::interpreter::Interpreter), evaluate a given string.
 pub fn run(s: String, i: &mut Interpreter, verbose: bool) -> Result<AplType, Vec<AplError>> {
     io::stdout().flush().unwrap();
     let mut scanner = Scanner::new(s);

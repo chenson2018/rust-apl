@@ -10,32 +10,45 @@
 //! The interpreter is relatively bare-bones. It supports a wide range of primitive glyphs,
 //! variables, and [direct
 //! functions](https://en.wikipedia.org/wiki/Direct_function#Dfns_versus_tradfns), but was created
-//! mostly as an instructive exercise for myself. In the sections below I have tried to provide
-//! sufficient documentation for anyone who might want to try something similar.
+//! mostly as an instructive exercise for myself and is thus missing many features a full
+//! implementation would have. In this documentation I have tried to provide sufficient
+//! explanations for anyone who might want to try something similar.
 //!
-//! ## Overview
+//! ## Executable
 //!
-//! To see the order that the interpreter uses, see [run.rs](crate::run::run) and how it is used
-//! for the [interpreter executable](../src/rust_apl/main.rs.html). The below sections attempt to
-//! give a guide for each piece.
+//! See [run.rs](crate::run::run) for the execution order and note how it is used
+//! for the [interpreter executable](https://github.com/chenson2018/rust-apl/blob/main/src/main.rs).
+//! The below sections attempt to give a guide for each piece.
 //!
-//! ### Scanning
+//! ## Scanning
 //!
-//! First, we enumerate the different types of tokens with [token::TokenType].
+//! First, we enumerate the different types of tokens with [token::TokenType], a representation of
+//! the groups of characters that have a syntactic meaning in our language. These can be a single
+//! character, like '+', or a group of characters, like '1.25' or 'hello'. This process is called
+//! scanning, performed in this crate by [scanner::Scanner] to produce a
+//! vector of [token::Token].
 //!
-//! ### Parsing
+//! TODO: put an example
+//!
+//! ## Parsing
+//!
+//! Next, now that we have a series of token, we want to transform this into an expression. The key
+//! here is that any expression can be represented by a single tree like structure, called an
+//! [abstact syntax tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree). This process is
+//! called parsing, performed in this crate by [parser::Parser] to produce a
+//! vector of [expr::Expr]. Continuing with the previous example:
+//!
+//! TODO: put an example
+//!
+//! ## Evaluation
 //!
 //! TODO
 //!
-//! ### Evaluation
+//! ## Variables
 //!
 //! TODO
 //!
-//! ### Variables
-//!
-//! TODO
-//!
-//! ### Functions
+//! ## Functions
 //!
 //! TODO
 //!
