@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["rust_apl"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.61.0/core/cmp/trait.Eq.html\" title=\"trait core::cmp::Eq\">Eq</a> for <a class=\"enum\" href=\"rust_apl/token/enum.TokenType.html\" title=\"enum rust_apl::token::TokenType\">TokenType</a>","synthetic":false,"types":["rust_apl::token::TokenType"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
