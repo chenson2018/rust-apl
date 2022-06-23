@@ -532,6 +532,13 @@
 <span id="527">527</span>
 <span id="528">528</span>
 <span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::io</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::apl_type::AplType</span>;
@@ -849,7 +856,11 @@
                 <span class="self">self</span>.<span class="ident">add</span>(<span class="ident">TokenType::Ampersand</span>);
             }
             <span class="string">&#39;¯&#39;</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">add</span>(<span class="ident">TokenType::HighMinus</span>);
+                <span class="self">self</span>.<span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">current</span>;
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">number</span>(<span class="op">-</span><span class="number">1.0</span>) {
+                    <span class="ident">errs</span>.<span class="ident">push</span>(<span class="ident">e</span>);
+                    <span class="ident">failed</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                };
             }
             <span class="string">&#39;⍬&#39;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">add</span>(<span class="ident">TokenType::Zilde</span>);
@@ -892,7 +903,7 @@
 
             <span class="kw">_</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_ascii_digit</span>() {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">number</span>() {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">number</span>(<span class="number">1.0</span>) {
                         <span class="ident">errs</span>.<span class="ident">push</span>(<span class="ident">e</span>);
                         <span class="ident">failed</span> <span class="op">=</span> <span class="bool-val">true</span>;
                     };
@@ -1020,7 +1031,7 @@
     }
 
     <span class="doccomment">/// scan a number</span>
-    <span class="kw">fn</span> <span class="ident">number</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">AplError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">number</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">scale</span>: <span class="ident">f64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">AplError</span><span class="op">&gt;</span> {
         <span class="kw">while</span> <span class="self">self</span>.<span class="ident">peek</span>().<span class="ident">is_ascii_digit</span>() {
             <span class="self">self</span>.<span class="ident">advance</span>();
         }
@@ -1036,7 +1047,10 @@
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>();
 
         <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">n</span>) =&gt; <span class="self">self</span>.<span class="ident">add_token</span>(<span class="ident">TokenType::Number</span>, <span class="ident">AplType::Scalar</span>(<span class="ident">Scalar::Number</span>(<span class="ident">n</span>))),
+            <span class="prelude-val">Ok</span>(<span class="ident">n</span>) =&gt; <span class="self">self</span>.<span class="ident">add_token</span>(
+                <span class="ident">TokenType::Number</span>,
+                <span class="ident">AplType::Scalar</span>(<span class="ident">Scalar::Number</span>(<span class="ident">scale</span> <span class="op">*</span> <span class="ident">n</span>)),
+            ),
             <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">AplError::with_lower</span>(
                     <span class="string">&quot;Invalid number&quot;</span>.<span class="ident">to_string</span>(),

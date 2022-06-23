@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["add",""]]});
+initSidebarItems({"fn":[["minus",""],["plus",""]]});
