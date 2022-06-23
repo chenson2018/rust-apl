@@ -1,11 +1,12 @@
 //use std::path::PathBuf;
 use clap::Parser;
-use std::fs::File;
-use std::io;
-use std::io::Write;
+use rustyline::error::ReadlineError;
+use rustyline::Editor;
 
 use std::error::Error;
-use std::io::prelude::*;
+use std::fs::File;
+//use std::io::prelude::*;
+use std::io::BufRead;
 use std::io::BufReader;
 use std::path::Path;
 
@@ -61,21 +62,38 @@ fn main() {
 
                 match run(s, &mut interpreter, args.verbose) {
                     Ok(value) => println!("{}", value),
-                    Err(err) => println!("{:#?}", err),
+                    Err(err) => println!("{}", err),
                 };
             }
         }
 
         // otherwise enter an interactive session
-        None => loop {
-            print!("> ");
-            io::stdout().flush().unwrap();
-            let mut line = String::new();
-            io::stdin().read_line(&mut line).unwrap();
-            match run(line, &mut interpreter, args.verbose) {
-                Ok(value) => println!("{}", value),
-                Err(err) => println!("{:#?}", err),
-            };
-        },
+        None => {
+            let mut rl = Editor::<()>::new();
+            loop {
+                let readline = rl.readline("> ");
+                match readline {
+                    Ok(line) => {
+                        rl.add_history_entry(line.as_str());
+                        match run(format!("{}\n", line), &mut interpreter, args.verbose) {
+                            Ok(value) => println!("{}", value),
+                            Err(errs) => println!("{}", errs),
+                        }
+                    }
+                    Err(ReadlineError::Interrupted) => {
+                        println!("CTRL-C");
+                        break;
+                    }
+                    Err(ReadlineError::Eof) => {
+                        println!("CTRL-D");
+                        break;
+                    }
+                    Err(err) => {
+                        println!("Error: {:?}", err);
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

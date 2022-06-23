@@ -29,6 +29,17 @@ impl fmt::Display for AplError {
     }
 }
 
+#[derive(Debug)]
+pub struct AplErrors(pub Vec<AplError>);
+
+impl fmt::Display for AplErrors {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.0.iter().fold(Ok(()), |result, error| {
+            result.and_then(|_| writeln!(f, "{}", error))
+        })
+    }
+}
+
 impl AplError {
     pub fn new(s: String, l: usize) -> AplError {
         AplError {
