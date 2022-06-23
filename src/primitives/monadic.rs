@@ -30,3 +30,10 @@ pub fn enclose(right: AplType) -> Result<AplType, &'static str> {
         })),
     }
 }
+
+pub fn negate(right: AplType) -> Result<AplType, &'static str> {
+    fn f(right: f64) -> f64 {
+        -right
+    }
+    right.scalar_monadic(&f)
+}

@@ -79,6 +79,7 @@ impl Interpreter {
                         match op.token {
                             TokenType::Plus => plus(left, right),
                             TokenType::Minus => minus(left, right),
+                            TokenType::Rho => reshape(left, right),
                             _ => todo!("Dyadic operator {:#?}", op.token),
                         }
                     }
@@ -93,6 +94,7 @@ impl Interpreter {
                 let right = self.evaluate(right)?;
 
                 let res = match op.token {
+                    TokenType::Minus => negate(right),
                     TokenType::Rho => shape(right),
                     TokenType::LeftShoe => enclose(right),
                     _ => todo!("Monadic operator {:#?}", op.token),

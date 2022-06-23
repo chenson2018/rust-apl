@@ -40,6 +40,28 @@ pub struct AplEnclose {
 // these are some helpers for converting back/forth from interpreted types to ndarrays
 
 impl AplType {
+    pub fn scalar_monadic(self, f: &dyn Fn(f64) -> f64) -> Result<AplType, &'static str> {
+        match self {
+            AplType::Scalar(Scalar::Number(r)) => Ok(AplType::Scalar(Scalar::Number(f(r)))),
+            AplType::Array(r) => {
+                let res = ArrayBase::from(r).mapv_into(f);
+                Ok(AplType::Array(AplArray::from(res)))
+            }
+            AplType::Enclose(r) => {
+                let shape = r.shape;
+
+                let values: Vec<AplType> = r
+                    .values
+                    .iter()
+                    .map(|x| x.clone().scalar_monadic(f).unwrap())
+                    .collect();
+
+                Ok(AplType::Enclose(AplEnclose { values, shape }))
+            }
+            _ => Err("non numeric argument to scalar function"),
+        }
+    }
+
     pub fn scalar_dyadic(
         self,
         other: AplType,

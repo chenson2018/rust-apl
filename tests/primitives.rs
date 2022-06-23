@@ -73,6 +73,15 @@ mod test {
     }
 
     #[test]
+    fn negate() {
+        apl_assert("-0", "0");
+        apl_assert("-1", "¯1");
+        apl_assert("-1 2 3", "¯1 ¯2 ¯3");
+        apl_assert("-(1 2)(3 4)", "(¯1 ¯2)(¯3 ¯4)");
+        apl_assert("-(1 (1 2) (1 (1 2) 3))", "(¯1 (¯1 ¯2) (¯1  (¯1 ¯2)  ¯3))");
+    }
+
+    #[test]
     fn enclose() {
         // a bit hard to test, because no parsing way to enclose a single array...
 
