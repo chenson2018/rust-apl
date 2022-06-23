@@ -115,6 +115,8 @@
 <span id="110">110</span>
 <span id="111">111</span>
 <span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::apl_type::AplType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::err::AplError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::expr::Expr</span>;
@@ -196,6 +198,7 @@
                         <span class="kw">match</span> <span class="ident">op</span>.<span class="ident">token</span> {
                             <span class="ident">TokenType::Plus</span> =&gt; <span class="ident">plus</span>(<span class="ident">left</span>, <span class="ident">right</span>),
                             <span class="ident">TokenType::Minus</span> =&gt; <span class="ident">minus</span>(<span class="ident">left</span>, <span class="ident">right</span>),
+                            <span class="ident">TokenType::Rho</span> =&gt; <span class="ident">reshape</span>(<span class="ident">left</span>, <span class="ident">right</span>),
                             <span class="kw">_</span> =&gt; <span class="macro">todo!</span>(<span class="string">&quot;Dyadic operator {:#?}&quot;</span>, <span class="ident">op</span>.<span class="ident">token</span>),
                         }
                     }
@@ -210,6 +213,7 @@
                 <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">evaluate</span>(<span class="ident">right</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">op</span>.<span class="ident">token</span> {
+                    <span class="ident">TokenType::Minus</span> =&gt; <span class="ident">negate</span>(<span class="ident">right</span>),
                     <span class="ident">TokenType::Rho</span> =&gt; <span class="ident">shape</span>(<span class="ident">right</span>),
                     <span class="ident">TokenType::LeftShoe</span> =&gt; <span class="ident">enclose</span>(<span class="ident">right</span>),
                     <span class="kw">_</span> =&gt; <span class="macro">todo!</span>(<span class="string">&quot;Monadic operator {:#?}&quot;</span>, <span class="ident">op</span>.<span class="ident">token</span>),

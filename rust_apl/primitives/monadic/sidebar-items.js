@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["enclose",""],["shape",""]]});
+initSidebarItems({"fn":[["enclose",""],["negate",""],["shape",""]]});
