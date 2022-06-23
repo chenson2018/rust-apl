@@ -35,7 +35,7 @@ mod test {
     }
 
     #[test]
-    fn add() {
+    fn plus() {
         // nine combos of scalar, vector (soon array!), enclose
         apl_assert("1+1", "2");
         apl_assert("1+1 2 3", "2 3 4");
@@ -51,6 +51,25 @@ mod test {
 
         // should fail for incompatible sizes
         assert_err("1 2+1 2 3");
+    }
+
+    #[test]
+    fn minus() {
+        // nine combos of scalar, vector (soon array!), enclose
+        apl_assert("1-2", "¯1");
+        apl_assert("1-1 2 3", "0 ¯1 ¯2");
+        apl_assert("1-(1 2)(3 4)", "(0 ¯1)(¯2 ¯3)");
+
+        apl_assert("1 2 3-1", "0 1 2");
+        apl_assert("1 2 3-4 5 6", "¯3 ¯3 ¯3");
+        apl_assert("(1 2 3)-(1 2)(3 4)(5 6)", "(0 ¯1)(¯1 ¯2)(¯2 ¯3)");
+
+        apl_assert("(1 2)(3 4)-1", "(0 1)(2 3)");
+        apl_assert("(1 2)(3 4)(5 6)-1 2 3", "(0 1)(1 2)(2 3)");
+        apl_assert("(1 2)(3 4)-(5 6)(7 8)", "(¯4 ¯4)(¯4 ¯4)");
+
+        // should fail for incompatible sizes
+        assert_err("1 2-1 2 3");
     }
 
     #[test]

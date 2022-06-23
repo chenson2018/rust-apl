@@ -77,7 +77,8 @@ impl Interpreter {
                     _ => {
                         let left = self.evaluate(left)?;
                         match op.token {
-                            TokenType::Plus => add(left, right),
+                            TokenType::Plus => plus(left, right),
+                            TokenType::Minus => minus(left, right),
                             _ => todo!("Dyadic operator {:#?}", op.token),
                         }
                     }

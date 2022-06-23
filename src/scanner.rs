@@ -315,7 +315,11 @@ impl Scanner {
                 self.add(TokenType::Ampersand);
             }
             '¯' => {
-                self.add(TokenType::HighMinus);
+                self.start = self.current;
+                if let Err(e) = self.number(-1.0) {
+                    errs.push(e);
+                    failed = true;
+                };
             }
             '⍬' => {
                 self.add(TokenType::Zilde);
@@ -358,7 +362,7 @@ impl Scanner {
 
             _ => {
                 if c.is_ascii_digit() {
-                    if let Err(e) = self.number() {
+                    if let Err(e) = self.number(1.0) {
                         errs.push(e);
                         failed = true;
                     };
@@ -486,7 +490,7 @@ impl Scanner {
     }
 
     /// scan a number
-    fn number(&mut self) -> Result<(), AplError> {
+    fn number(&mut self, scale: f64) -> Result<(), AplError> {
         while self.peek().is_ascii_digit() {
             self.advance();
         }
@@ -502,7 +506,10 @@ impl Scanner {
             .collect::<String>();
 
         match s.parse::<f64>() {
-            Ok(n) => self.add_token(TokenType::Number, AplType::Scalar(Scalar::Number(n))),
+            Ok(n) => self.add_token(
+                TokenType::Number,
+                AplType::Scalar(Scalar::Number(scale * n)),
+            ),
             Err(e) => {
                 return Err(AplError::with_lower(
                     "Invalid number".to_string(),
