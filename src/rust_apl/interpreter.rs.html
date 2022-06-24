@@ -117,6 +117,7 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
+<span id="115">115</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::apl_type::AplType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::err::AplError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::expr::Expr</span>;
@@ -159,6 +160,7 @@
 
     <span class="kw">fn</span> <span class="ident">evaluate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="ident">Expr</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AplType</span>, <span class="ident">AplError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">e</span> {
+            <span class="ident">Expr::Null</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AplType::Null</span>),
             <span class="ident">Expr::Enclose</span>(<span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">shape</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">t</span>.<span class="ident">len</span>()];
 

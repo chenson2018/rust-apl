@@ -176,7 +176,6 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
-<span id="174">174</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::err::AplError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::expr::Expr</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::token</span>::{<span class="ident">Token</span>, <span class="ident">TokenType</span>};
@@ -282,17 +281,19 @@
             <span class="ident">TokenType::LeftArrow</span>,
         ]) {
             <span class="kw">let</span> <span class="ident">op</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">previous</span>();
-            <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">primary</span>();
+            <span class="kw">let</span> <span class="ident">left</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">primary</span>();
 
-            <span class="comment">// TODO: this is not good....</span>
-            <span class="kw">match</span> <span class="ident">right</span> {
+            <span class="kw">match</span> <span class="ident">left</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">Expr::Null</span>) =&gt; {
+                    <span class="ident">e</span> <span class="op">=</span> <span class="ident">Expr::Monadic</span>(<span class="ident">op</span>, <span class="ident">Rc::new</span>(<span class="ident">e</span>));
+                }
                 <span class="prelude-val">Ok</span>(<span class="ident">r</span>) =&gt; {
                     <span class="ident">e</span> <span class="op">=</span> <span class="ident">Expr::Dyadic</span>(<span class="ident">Rc::new</span>(<span class="ident">r</span>), <span class="ident">op</span>, <span class="ident">Rc::new</span>(<span class="ident">e</span>));
                 }
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="ident">e</span> <span class="op">=</span> <span class="ident">Expr::Monadic</span>(<span class="ident">op</span>, <span class="ident">Rc::new</span>(<span class="ident">e</span>));
+                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
+                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
                 }
-            }
+            };
         }
         <span class="prelude-val">Ok</span>(<span class="ident">e</span>)
     }
@@ -338,10 +339,7 @@
         <span class="kw">let</span> <span class="ident">all_lit</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">s</span>, <span class="ident">Expr::Literal</span>(<span class="kw">_</span>)));
 
         <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_empty</span>() {
-            <span class="prelude-val">Err</span>(<span class="ident">AplError::new</span>(
-                <span class="string">&quot;Expected expression&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="self">self</span>.<span class="ident">peek</span>().<span class="ident">line</span>,
-            ))
+            <span class="prelude-val">Ok</span>(<span class="ident">Expr::Null</span>)
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">v</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>())
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">all_lit</span> {
