@@ -12,11 +12,13 @@ pub enum Expr {
     Variable(Token),
     Enclose(Vec<Expr>),
     Array(Vec<Expr>),
+    Null,
 }
 
 impl fmt::Display for Expr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
+            Expr::Null => Ok(()),
             Expr::Dyadic(ref left, ref token, ref right) => {
                 write!(f, "({} {} {})", &token.lexeme, left, right)
             }

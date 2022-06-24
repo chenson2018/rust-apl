@@ -40,6 +40,7 @@ impl Interpreter {
 
     fn evaluate(&mut self, e: &Expr) -> Result<AplType, AplError> {
         match e {
+            Expr::Null => Ok(AplType::Null),
             Expr::Enclose(ref t) => {
                 let shape = vec![t.len()];
 

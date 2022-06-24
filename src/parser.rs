@@ -103,17 +103,19 @@ impl Parser {
             TokenType::LeftArrow,
         ]) {
             let op = self.previous();
-            let right = self.primary();
+            let left = self.primary();
 
-            // TODO: this is not good....
-            match right {
+            match left {
+                Ok(Expr::Null) => {
+                    e = Expr::Monadic(op, Rc::new(e));
+                }
                 Ok(r) => {
                     e = Expr::Dyadic(Rc::new(r), op, Rc::new(e));
                 }
-                Err(_) => {
-                    e = Expr::Monadic(op, Rc::new(e));
+                Err(err) => {
+                    return Err(err);
                 }
-            }
+            };
         }
         Ok(e)
     }
@@ -159,10 +161,7 @@ impl Parser {
         let all_lit = v.iter().all(|s| matches!(s, Expr::Literal(_)));
 
         if v.is_empty() {
-            Err(AplError::new(
-                "Expected expression".to_string(),
-                self.peek().line,
-            ))
+            Ok(Expr::Null)
         } else if v.len() == 1 {
             Ok(v.clone().into_iter().next().unwrap())
         } else if all_lit {
