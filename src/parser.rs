@@ -4,6 +4,29 @@ use crate::token::{Token, TokenType};
 
 use std::rc::Rc;
 
+// these define the few functions that only have one meaning
+// TODO: handle operators
+// TODO: Niladic
+
+static DYADIC_ONLY: [TokenType; 14] = [
+    TokenType::LeftArrow,
+    TokenType::UpTack,
+    TokenType::DownTack,
+    TokenType::Equal,
+    TokenType::LessThanEqual,
+    TokenType::LessThan,
+    TokenType::GreaterThan,
+    TokenType::GreaterThanEqual,
+    TokenType::Or,
+    TokenType::And,
+    TokenType::Nor,
+    TokenType::Nand,
+    TokenType::EpsilonUnderbar,
+    TokenType::UpShoe,
+];
+
+//static MONADIC_ONLY: [TokenType; 0] = [];
+
 /// A struct representing a parser. This operates much like
 /// [rust_apl::scanner::Scanner](crate::scanner::Scanner), but instead of transforming raw
 /// characters into tokens, this takes those tokens and builds a tree representing an expression.
@@ -107,7 +130,14 @@ impl Parser {
 
             match left {
                 Ok(Expr::Null) => {
-                    e = Expr::Monadic(op, Rc::new(e));
+                    if DYADIC_ONLY.contains(&op.token) {
+                        return Err(AplError::new(
+                            "Left argument required.".to_string(),
+                            op.line,
+                        ));
+                    } else {
+                        e = Expr::Monadic(op, Rc::new(e));
+                    };
                 }
                 Ok(r) => {
                     e = Expr::Dyadic(Rc::new(r), op, Rc::new(e));
