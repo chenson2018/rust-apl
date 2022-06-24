@@ -176,11 +176,64 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::err::AplError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::expr::Expr</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::token</span>::{<span class="ident">Token</span>, <span class="ident">TokenType</span>};
 
 <span class="kw">use</span> <span class="ident">std::rc::Rc</span>;
+
+<span class="comment">// these define the few functions that only have one meaning</span>
+<span class="comment">// TODO: handle operators</span>
+<span class="comment">// TODO: Niladic</span>
+
+<span class="kw">static</span> <span class="ident">DYADIC_ONLY</span>: [<span class="ident">TokenType</span>; <span class="number">14</span>] <span class="op">=</span> [
+    <span class="ident">TokenType::LeftArrow</span>,
+    <span class="ident">TokenType::UpTack</span>,
+    <span class="ident">TokenType::DownTack</span>,
+    <span class="ident">TokenType::Equal</span>,
+    <span class="ident">TokenType::LessThanEqual</span>,
+    <span class="ident">TokenType::LessThan</span>,
+    <span class="ident">TokenType::GreaterThan</span>,
+    <span class="ident">TokenType::GreaterThanEqual</span>,
+    <span class="ident">TokenType::Or</span>,
+    <span class="ident">TokenType::And</span>,
+    <span class="ident">TokenType::Nor</span>,
+    <span class="ident">TokenType::Nand</span>,
+    <span class="ident">TokenType::EpsilonUnderbar</span>,
+    <span class="ident">TokenType::UpShoe</span>,
+];
+
+<span class="comment">//static MONADIC_ONLY: [TokenType; 0] = [];</span>
 
 <span class="doccomment">/// A struct representing a parser. This operates much like</span>
 <span class="doccomment">/// [rust_apl::scanner::Scanner](crate::scanner::Scanner), but instead of transforming raw</span>
@@ -285,7 +338,14 @@
 
             <span class="kw">match</span> <span class="ident">left</span> {
                 <span class="prelude-val">Ok</span>(<span class="ident">Expr::Null</span>) =&gt; {
-                    <span class="ident">e</span> <span class="op">=</span> <span class="ident">Expr::Monadic</span>(<span class="ident">op</span>, <span class="ident">Rc::new</span>(<span class="ident">e</span>));
+                    <span class="kw">if</span> <span class="ident">DYADIC_ONLY</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">op</span>.<span class="ident">token</span>) {
+                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">AplError::new</span>(
+                            <span class="string">&quot;Left argument required.&quot;</span>.<span class="ident">to_string</span>(),
+                            <span class="ident">op</span>.<span class="ident">line</span>,
+                        ));
+                    } <span class="kw">else</span> {
+                        <span class="ident">e</span> <span class="op">=</span> <span class="ident">Expr::Monadic</span>(<span class="ident">op</span>, <span class="ident">Rc::new</span>(<span class="ident">e</span>));
+                    };
                 }
                 <span class="prelude-val">Ok</span>(<span class="ident">r</span>) =&gt; {
                     <span class="ident">e</span> <span class="op">=</span> <span class="ident">Expr::Dyadic</span>(<span class="ident">Rc::new</span>(<span class="ident">r</span>), <span class="ident">op</span>, <span class="ident">Rc::new</span>(<span class="ident">e</span>));
