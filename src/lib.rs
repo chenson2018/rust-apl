@@ -58,6 +58,9 @@ pub mod parser;
 pub mod run;
 pub mod scanner;
 
+#[macro_use]
+extern crate lazy_static;
+
 mod apl_type;
 mod environment;
 mod err;

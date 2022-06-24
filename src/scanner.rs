@@ -5,6 +5,7 @@ use crate::apl_type::Scalar;
 use crate::err::AplError;
 use crate::token::Token;
 use crate::token::TokenType;
+use crate::token::TOKENS;
 
 /// A struct representing a scanner. Note the difference between `self.current` and `self.start`.
 /// Suppose that we are scanning something like a number, string, or identifier (variable) that
@@ -84,293 +85,61 @@ impl Scanner {
         let mut failed = false;
         let c = self.advance();
 
-        match c {
-            // glyphs
-            '←' => {
-                self.add(TokenType::LeftArrow);
-            }
-            '+' => {
-                self.add(TokenType::Plus);
-            }
-            '-' => {
-                self.add(TokenType::Minus);
-            }
-            '÷' => {
-                self.add(TokenType::Divide);
-            }
-            '*' => {
-                self.add(TokenType::Star);
-            }
-            '⍟' => {
-                self.add(TokenType::Log);
-            }
-            '⌹' => {
-                self.add(TokenType::Domino);
-            }
-            '○' => {
-                self.add(TokenType::Circle);
-            }
-            '!' => {
-                self.add(TokenType::ExclamationMark);
-            }
-            '?' => {
-                self.add(TokenType::QuestionMark);
-            }
-            '|' => {
-                self.add(TokenType::Stile);
-            }
-            '⌈' => {
-                self.add(TokenType::Upstile);
-            }
-            '⌊' => {
-                self.add(TokenType::Downstile);
-            }
-            '⊥' => {
-                self.add(TokenType::UpTack);
-            }
-            '⊤' => {
-                self.add(TokenType::DownTack);
-            }
-            '⊣' => {
-                self.add(TokenType::LeftTack);
-            }
-            '⊢' => {
-                self.add(TokenType::RightTack);
-            }
-            '=' => {
-                self.add(TokenType::Equal);
-            }
-            '≠' => {
-                self.add(TokenType::NotEqual);
-            }
-            '≤' => {
-                self.add(TokenType::LessThanEqual);
-            }
-            '<' => {
-                self.add(TokenType::LessThan);
-            }
-            '>' => {
-                self.add(TokenType::GreaterThan);
-            }
-            '≥' => {
-                self.add(TokenType::GreaterThanEqual);
-            }
-            '≡' => {
-                self.add(TokenType::EqualUnderbar);
-            }
-            '≢' => {
-                self.add(TokenType::EqualUnderbarSlash);
-            }
-            '∨' => {
-                self.add(TokenType::Or);
-            }
-            '∧' => {
-                self.add(TokenType::And);
-            }
-            '⍱' => {
-                self.add(TokenType::Nor);
-            }
-            '⍲' => {
-                self.add(TokenType::Nand);
-            }
-            '↑' => {
-                self.add(TokenType::UpArrow);
-            }
-            '↓' => {
-                self.add(TokenType::DownArrow);
-            }
-            '⊂' => {
-                self.add(TokenType::LeftShoe);
-            }
-            '⊃' => {
-                self.add(TokenType::RightShoe);
-            }
-            '⊆' => {
-                self.add(TokenType::LeftShoeUnderbar);
-            }
-            '⌷' => {
-                self.add(TokenType::Squad);
-            }
-            '⍋' => {
-                self.add(TokenType::GradeUp);
-            }
-            '⍒' => {
-                self.add(TokenType::GradeDown);
-            }
-            '⍳' => {
-                self.add(TokenType::Iota);
-            }
-            '⍸' => {
-                self.add(TokenType::IotaUnderbar);
-            }
-            '∊' => {
-                self.add(TokenType::Epsilon);
-            }
-            '⍷' => {
-                self.add(TokenType::EpsilonUnderbar);
-            }
-            '∪' => {
-                self.add(TokenType::DownShoe);
-            }
-            '∩' => {
-                self.add(TokenType::UpShoe);
-            }
-            '~' => {
-                self.add(TokenType::Tilde);
-            }
-            '/' => {
-                self.add(TokenType::Slash);
-            }
-            '\\' => {
-                self.add(TokenType::Backslash);
-            }
-            '⌿' => {
-                self.add(TokenType::SlashBar);
-            }
-            '⍀' => {
-                self.add(TokenType::BackslashBar);
-            }
-            ',' => {
-                self.add(TokenType::Comma);
-            }
-            '⍪' => {
-                self.add(TokenType::CommaBar);
-            }
-            '⍴' => {
-                self.add(TokenType::Rho);
-            }
-            '⌽' => {
-                self.add(TokenType::CircleStile);
-            }
-            '⊖' => {
-                self.add(TokenType::CircleBar);
-            }
-            '⍉' => {
-                self.add(TokenType::Transpose);
-            }
-            '¨' => {
-                self.add(TokenType::Diaeresis);
-            }
-            '⍨' => {
-                self.add(TokenType::TildeDiaeresis);
-            }
-            '⍣' => {
-                self.add(TokenType::StarDiaeresis);
-            }
-            '.' => {
-                self.add(TokenType::Dot);
-            }
-            '∘' => {
-                self.add(TokenType::Jot);
-            }
-            '⍤' => {
-                self.add(TokenType::JotDiaeresis);
-            }
-            '⍥' => {
-                self.add(TokenType::CircleDiaeresis);
-            }
-            '@' => {
-                self.add(TokenType::At);
-            }
-            '⍞' => {
-                self.add(TokenType::QuoteQuad);
-            }
-            '⎕' => {
-                self.add(TokenType::Quad);
-            }
-            '⍠' => {
-                self.add(TokenType::QuadColon);
-            }
-            '⌸' => {
-                self.add(TokenType::QuadEqual);
-            }
-            '⌺' => {
-                self.add(TokenType::QuadDiamond);
-            }
-            '⌶' => {
-                self.add(TokenType::Ibeam);
-            }
-            '⍎' => {
-                self.add(TokenType::Hydrant);
-            }
-            '⍕' => {
-                self.add(TokenType::Thorn);
-            }
-            '⋄' => {
-                self.add(TokenType::Diamond);
-            }
-            '→' => {
-                self.add(TokenType::RightArrow);
-            }
-            '⍵' => {
-                self.add(TokenType::Omega);
-            }
-            '⍺' => {
-                self.add(TokenType::Alpha);
-            }
-            '∇' => {
-                self.add(TokenType::Del);
-            }
-            '&' => {
-                self.add(TokenType::Ampersand);
-            }
-            '¯' => {
-                self.start = self.current;
-                if let Err(e) = self.number(-1.0) {
-                    errs.push(e);
-                    failed = true;
+        // if we match 'simple' one char token, add it
+        match TOKENS.get(&c) {
+            Some(tt) => self.add(tt.clone()),
+            None => {
+                match c {
+                    // High Minus is syntactical
+                    // TODO: fix lexeme added here
+                    '¯' => {
+                        self.start = self.current;
+                        if let Err(e) = self.number(-1.0) {
+                            errs.push(e);
+                            failed = true;
+                        };
+                    }
+
+                    // move past comments
+                    '⍝' => {
+                        while self.peek() != '\n' && !(self.is_end()) {
+                            self.advance();
+                        }
+                    }
+
+                    // strings
+                    '\'' => {
+                        if let Err(e) = self.string() {
+                            errs.push(e);
+                            failed = true;
+                        }
+                    }
+
+                    // end of line
+                    '\n' => {
+                        self.line += 1;
+                        self.add(TokenType::Newline);
+                    }
+
+                    // whitespace
+                    ' ' => (),
+                    '\r' => (),
+                    '\t' => (),
+
+                    // numbers or variables
+                    _ => {
+                        if c.is_ascii_digit() {
+                            if let Err(e) = self.number(1.0) {
+                                errs.push(e);
+                                failed = true;
+                            };
+                        } else if c.is_alphabetic() || c == '_' || c == '-' {
+                            self.identifier();
+                        } else {
+                            errs.push(AplError::new("Unexpected character".to_string(), self.line));
+                        }
+                    }
                 };
-            }
-            '⍬' => {
-                self.add(TokenType::Zilde);
-            }
-            // move past comments
-            '⍝' => {
-                while self.peek() != '\n' && !(self.is_end()) {
-                    self.advance();
-                }
-            }
-            // non glyphs
-            '(' => {
-                self.add(TokenType::LeftParenthesis);
-            }
-            ')' => {
-                self.add(TokenType::RightParenthesis);
-            }
-            '{' => {
-                self.add(TokenType::LeftBrace);
-            }
-            '}' => {
-                self.add(TokenType::RightBrace);
-            }
-            '\'' => {
-                if let Err(e) = self.string() {
-                    errs.push(e);
-                    failed = true;
-                }
-            }
-            // end of line
-            '\n' => {
-                self.line += 1;
-                self.add(TokenType::Newline);
-            }
-
-            // whitespace
-            ' ' => (),
-            '\r' => (),
-            '\t' => (),
-
-            _ => {
-                if c.is_ascii_digit() {
-                    if let Err(e) = self.number(1.0) {
-                        errs.push(e);
-                        failed = true;
-                    };
-                } else if c.is_alphabetic() || c == '_' || c == '-' {
-                    self.identifier();
-                } else {
-                    errs.push(AplError::new("Unexpected character".to_string(), self.line));
-                }
             }
         };
 
