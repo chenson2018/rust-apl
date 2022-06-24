@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["rust_apl"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.61.0/core/ops/deref/trait.Deref.html\" title=\"trait core::ops::deref::Deref\">Deref</a> for <a class=\"struct\" href=\"rust_apl/token/struct.TOKENS.html\" title=\"struct rust_apl::token::TOKENS\">TOKENS</a>","synthetic":false,"types":["rust_apl::token::TOKENS"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

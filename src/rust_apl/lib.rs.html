@@ -69,6 +69,9 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">rustdoc::private_intra_doc_links</span>)]</span>
 
 <span class="doccomment">//! This crate provides an interpreter for the language</span>
@@ -128,6 +131,9 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">parser</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">run</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">scanner</span>;
+
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">lazy_static</span>;
 
 <span class="kw">mod</span> <span class="ident">apl_type</span>;
 <span class="kw">mod</span> <span class="ident">environment</span>;
