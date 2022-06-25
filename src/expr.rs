@@ -10,7 +10,6 @@ pub enum Expr {
     Monadic(Token, Rc<Expr>),
     Literal(AplType),
     Variable(Token),
-    Enclose(Vec<Expr>),
     Array(Vec<Expr>),
     Null,
 }
@@ -33,14 +32,6 @@ impl fmt::Display for Expr {
             }
             Expr::Variable(ref token) => {
                 write!(f, "var({})", &token.lexeme)
-            }
-            Expr::Enclose(ref vec) => {
-                write!(f, "[")?;
-                for v in vec {
-                    write!(f, " {}", v)?;
-                }
-                write!(f, "]")?;
-                Ok(())
             }
             Expr::Array(ref vec) => {
                 write!(f, "[")?;

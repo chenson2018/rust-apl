@@ -1,4 +1,4 @@
-use crate::apl_type::AplEnclose;
+use crate::apl_type::AplArray;
 use crate::apl_type::AplType;
 //use crate::apl_type::Scalar;
 
@@ -20,11 +20,7 @@ pub fn enclose(right: AplType) -> Result<AplType, &'static str> {
         AplType::Name(_) => panic!("Call on unevaluated name."),
         AplType::Null => panic!("Call on Null"),
         AplType::Scalar(_) => Ok(right),
-        AplType::Enclose(x) => Ok(AplType::Enclose(AplEnclose {
-            values: vec![AplType::Enclose(x)],
-            shape: vec![],
-        })),
-        AplType::Array(x) => Ok(AplType::Enclose(AplEnclose {
+        AplType::Array(x) => Ok(AplType::Array(AplArray {
             values: vec![AplType::Array(x)],
             shape: vec![],
         })),

@@ -3,10 +3,9 @@ use crate::err::AplError;
 use crate::expr::Expr;
 use crate::token::TokenType;
 
-use crate::apl_type::extract_scalar;
+//use crate::apl_type::extract_scalar;
 use crate::apl_type::AplArray;
-use crate::apl_type::AplEnclose;
-use crate::apl_type::Scalar;
+//use crate::apl_type::Scalar;
 use crate::environment::Environment;
 
 use crate::primitives::dyadic::*;
@@ -41,23 +40,13 @@ impl Interpreter {
     fn evaluate(&mut self, e: &Expr) -> Result<AplType, AplError> {
         match e {
             Expr::Null => Ok(AplType::Null),
-            Expr::Enclose(ref t) => {
+            Expr::Array(ref t) => {
                 let shape = vec![t.len()];
 
                 let values = t
                     .iter()
                     .map(|x| self.evaluate(x).unwrap())
                     .collect::<Vec<AplType>>();
-
-                Ok(AplType::Enclose(AplEnclose { values, shape }))
-            }
-            Expr::Array(ref t) => {
-                let shape = vec![t.len()];
-
-                let values = t
-                    .iter()
-                    .map(|x| extract_scalar(self.evaluate(x).unwrap()))
-                    .collect::<Vec<Scalar>>();
 
                 Ok(AplType::Array(AplArray { values, shape }))
             }

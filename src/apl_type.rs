@@ -13,7 +13,6 @@ pub enum AplType {
     Scalar(Scalar),
     Name(String),
     Array(AplArray),
-    Enclose(AplEnclose),
     Null,
 }
 
@@ -27,36 +26,53 @@ pub enum Scalar {
 
 #[derive(Debug, Clone)]
 pub struct AplArray {
-    pub values: Vec<Scalar>,
-    pub shape: Vec<usize>,
-}
-
-#[derive(Debug, Clone)]
-pub struct AplEnclose {
     pub values: Vec<AplType>,
     pub shape: Vec<usize>,
 }
 
 // these are some helpers for converting back/forth from interpreted types to ndarrays
 
+fn all_scalar(v: &[AplType]) -> bool {
+    v.iter().all(|s| matches!(s, AplType::Scalar(_)))
+}
+
+fn one_enclose(v: &[AplType]) -> bool {
+    v.len() == 1 && !all_scalar(v)
+}
+
 impl AplType {
+    pub fn simple_array(&self) -> bool {
+        match self {
+            AplType::Array(arr) => all_scalar(&arr.values),
+            _ => false,
+        }
+    }
+
+    pub fn scalar_enclose(&self) -> bool {
+        match self {
+            AplType::Array(AplArray { values, .. }) => one_enclose(values),
+            _ => false,
+        }
+    }
+
     pub fn scalar_monadic(self, f: &dyn Fn(f64) -> f64) -> Result<AplType, &'static str> {
         match self {
             AplType::Scalar(Scalar::Number(r)) => Ok(AplType::Scalar(Scalar::Number(f(r)))),
             AplType::Array(r) => {
-                let res = ArrayBase::from(r).mapv_into(f);
-                Ok(AplType::Array(AplArray::from(res)))
-            }
-            AplType::Enclose(r) => {
-                let shape = r.shape;
-
-                let values: Vec<AplType> = r
-                    .values
-                    .iter()
-                    .map(|x| x.clone().scalar_monadic(f).unwrap())
-                    .collect();
-
-                Ok(AplType::Enclose(AplEnclose { values, shape }))
+                if all_scalar(&r.values) {
+                    let res = ArrayBase::from(r).mapv_into(f);
+                    Ok(AplType::Array(AplArray::from(res)))
+                } else {
+                    let shape = r.shape;
+                    Ok(AplType::Array(AplArray {
+                        values: r
+                            .values
+                            .iter()
+                            .map(|x| x.clone().scalar_monadic(f).unwrap())
+                            .collect(),
+                        shape,
+                    }))
+                }
             }
             _ => Err("non numeric argument to scalar function"),
         }
@@ -72,147 +88,116 @@ impl AplType {
                 Ok(AplType::Scalar(Scalar::Number(f(l, r))))
             }
             (AplType::Array(r), AplType::Scalar(Scalar::Number(l))) => {
-                let res = ArrayBase::from(r).mapv_into(|v| f(v, l));
-                Ok(AplType::Array(AplArray::from(res)))
+                if all_scalar(&r.values) {
+                    let nd_arr = ArrayBase::from(r).mapv_into(|v| f(v, l));
+                    Ok(AplType::Array(AplArray::from(nd_arr)))
+                } else {
+                    let shape = r.shape;
+
+                    let values: Vec<AplType> = r
+                        .values
+                        .iter()
+                        .map(|x| {
+                            x.clone()
+                                .scalar_dyadic(AplType::Scalar(Scalar::Number(l)), f)
+                                .unwrap()
+                        })
+                        .collect();
+
+                    Ok(AplType::Array(AplArray { values, shape }))
+                }
             }
             (AplType::Scalar(Scalar::Number(l)), AplType::Array(r)) => {
-                let res = ArrayBase::from(r).mapv_into(|v| f(l, v));
-                Ok(AplType::Array(AplArray::from(res)))
-            }
-            (AplType::Scalar(Scalar::Number(l)), AplType::Enclose(r)) => {
-                let shape = r.shape;
-
-                let values: Vec<AplType> = r
-                    .values
-                    .iter()
-                    .map(|x| {
-                        AplType::Scalar(Scalar::Number(l))
-                            .scalar_dyadic(x.clone(), f)
-                            .unwrap()
-                    })
-                    .collect();
-
-                Ok(AplType::Enclose(AplEnclose { values, shape }))
-            }
-            (AplType::Enclose(r), AplType::Scalar(Scalar::Number(l))) => {
-                let shape = r.shape;
-
-                let values: Vec<AplType> = r
-                    .values
-                    .iter()
-                    .map(|x| {
-                        x.clone()
-                            .scalar_dyadic(AplType::Scalar(Scalar::Number(l)), f)
-                            .unwrap()
-                    })
-                    .collect();
-
-                Ok(AplType::Enclose(AplEnclose { values, shape }))
-            }
-            (AplType::Enclose(r), AplType::Array(l)) => {
-                if r.values.len() == 1 {
-                    let shape = l.shape.clone();
-                    let mut rep = iter::repeat(r.values[0].clone());
-
-                    let values: Vec<AplType> = l
-                        .values
-                        .iter()
-                        .map(|x| {
-                            AplType::Scalar(x.clone())
-                                .scalar_dyadic(rep.next().unwrap(), f)
-                                .unwrap()
-                        })
-                        .collect();
-
-                    Ok(AplType::Enclose(AplEnclose { values, shape }))
+                if all_scalar(&r.values) {
+                    let res = ArrayBase::from(r).mapv_into(|v| f(l, v));
+                    Ok(AplType::Array(AplArray::from(res)))
                 } else {
                     let shape = r.shape;
 
                     let values: Vec<AplType> = r
                         .values
                         .iter()
-                        .zip(l.values)
-                        .map(|(x, y)| x.clone().scalar_dyadic(AplType::Scalar(y), f).unwrap())
-                        .collect();
-                    Ok(AplType::Enclose(AplEnclose { values, shape }))
-                }
-            }
-            (AplType::Array(l), AplType::Enclose(r)) => {
-                if r.values.len() == 1 {
-                    let shape = l.shape.clone();
-                    let mut rep = iter::repeat(r.values[0].clone());
-
-                    let values: Vec<AplType> = l
-                        .values
-                        .iter()
                         .map(|x| {
-                            rep.next()
-                                .unwrap()
-                                .scalar_dyadic(AplType::Scalar(x.clone()), f)
+                            AplType::Scalar(Scalar::Number(l))
+                                .scalar_dyadic(x.clone(), f)
                                 .unwrap()
                         })
                         .collect();
 
-                    Ok(AplType::Enclose(AplEnclose { values, shape }))
-                } else {
-                    let shape = r.shape;
-
-                    let values: Vec<AplType> = r
-                        .values
-                        .iter()
-                        .zip(l.values)
-                        .map(|(x, y)| AplType::Scalar(y).scalar_dyadic(x.clone(), f).unwrap())
-                        .collect();
-                    Ok(AplType::Enclose(AplEnclose { values, shape }))
+                    Ok(AplType::Array(AplArray { values, shape }))
                 }
             }
-
             (AplType::Array(l), AplType::Array(r)) => {
-                if l.shape != r.shape {
-                    return Err("Incompatibile shapes");
+                if all_scalar(&l.values) && all_scalar(&r.values) {
+                    if l.shape != r.shape {
+                        return Err("Incompatibile shapes");
+                    }
+                    let mut res: ArrayBase<OwnedRepr<f64>, Dim<IxDynImpl>> =
+                        ArrayBase::zeros(r.shape.clone());
+
+                    Zip::from(&mut res)
+                        .and(&ArrayBase::from(l))
+                        .and(&ArrayBase::from(r))
+                        .for_each(|a, &b, &c| {
+                            *a = f(b, c);
+                        });
+
+                    Ok(AplType::Array(AplArray::from(res)))
+                } else if one_enclose(&l.values) && !one_enclose(&r.values) {
+                    let shape = r.shape.clone();
+                    let mut rep = iter::repeat(l.values[0].clone());
+
+                    let values: Vec<AplType> = r
+                        .values
+                        .iter()
+                        .map(|x| x.clone().scalar_dyadic(rep.next().unwrap(), f).unwrap())
+                        .collect();
+
+                    Ok(AplType::Array(AplArray { values, shape }))
+                } else if (!one_enclose(&l.values)) && one_enclose(&r.values) {
+                    let shape = l.shape.clone();
+                    let mut rep = iter::repeat(r.values[0].clone());
+
+                    let values: Vec<AplType> = l
+                        .values
+                        .iter()
+                        .map(|x| x.clone().scalar_dyadic(rep.next().unwrap(), f).unwrap())
+                        .collect();
+
+                    Ok(AplType::Array(AplArray { values, shape }))
+                } else {
+                    if l.shape != r.shape {
+                        return Err("Incompatibile shapes");
+                    }
+
+                    let shape = r.shape;
+
+                    let values: Vec<AplType> = l
+                        .values
+                        .iter()
+                        .zip(r.values)
+                        .map(|(x, y)| x.clone().scalar_dyadic(y, f).unwrap())
+                        .collect();
+
+                    Ok(AplType::Array(AplArray { values, shape }))
                 }
-                let mut r2: ArrayBase<OwnedRepr<f64>, Dim<IxDynImpl>> =
-                    ArrayBase::zeros(r.shape.clone());
-
-                Zip::from(&mut r2)
-                    .and(&ArrayBase::from(l))
-                    .and(&ArrayBase::from(r))
-                    .for_each(|a, &b, &c| {
-                        *a = f(b, c);
-                    });
-
-                Ok(AplType::Array(AplArray::from(r2)))
             }
-
-            (AplType::Enclose(l), AplType::Enclose(r)) => {
-                let shape = r.shape;
-
-                let values: Vec<AplType> = l
-                    .values
-                    .iter()
-                    .zip(r.values)
-                    .map(|(x, y)| x.clone().scalar_dyadic(y, f).unwrap())
-                    .collect();
-
-                Ok(AplType::Enclose(AplEnclose { values, shape }))
-            }
-
             _ => Err("non numeric argument to scalar function"),
         }
     }
 }
 
-pub fn extract_scalar(apl: AplType) -> Scalar {
-    match apl {
-        AplType::Scalar(x) => x,
-        _ => panic!("extract_scalar received a non-scalar"),
-    }
-}
+//pub fn extract_scalar(apl: AplType) -> Scalar {
+//    match apl {
+//        AplType::Scalar(x) => x,
+//        _ => panic!("extract_scalar received a non-scalar"),
+//    }
+//}
 
-pub fn extract_f64(apl: Vec<Scalar>) -> Vec<f64> {
+pub fn extract_f64(apl: Vec<AplType>) -> Vec<f64> {
     apl.iter()
         .map(|x| match *x {
-            Scalar::Number(x) => x,
+            AplType::Scalar(Scalar::Number(x)) => x,
             _ => panic!("extract_scalar received a non-scalar"),
         })
         .collect::<Vec<f64>>()
@@ -227,7 +212,10 @@ impl From<AplArray> for ArrayBase<OwnedRepr<f64>, Dim<IxDynImpl>> {
 impl From<ArrayBase<OwnedRepr<f64>, Dim<IxDynImpl>>> for AplArray {
     fn from(v: ArrayBase<OwnedRepr<f64>, Dim<IxDynImpl>>) -> Self {
         let shape = v.shape().to_vec();
-        let values = v.into_iter().map(Scalar::Number).collect::<Vec<Scalar>>();
+        let values = v
+            .into_iter()
+            .map(|x| AplType::Scalar(Scalar::Number(x)))
+            .collect::<Vec<AplType>>();
         AplArray { values, shape }
     }
 }
@@ -257,7 +245,6 @@ impl PartialEq for AplType {
     fn eq(&self, other: &AplType) -> bool {
         match (self, other) {
             (&AplType::Scalar(ref s), &AplType::Scalar(ref o)) => (s == o),
-            (&AplType::Enclose(ref s), &AplType::Enclose(ref o)) => (s.values == o.values),
             (&AplType::Array(ref s), &AplType::Array(ref o)) => (s.values == o.values),
             _ => false, // Name is left out here... something feels odd about this...
         }
@@ -270,20 +257,18 @@ impl fmt::Display for AplType {
             AplType::Null => Ok(()),
             AplType::Scalar(ref s) => write!(f, "{}", s),
             AplType::Name(ref b) => write!(f, "{}", b),
-            AplType::Enclose(ref vec) => {
-                write!(f, "<<")?;
-                for v in &vec.values {
-                    write!(f, " {} ", v)?;
-                }
-                write!(f, ">>")?;
-                Ok(())
-            }
             AplType::Array(ref vec) => {
-                write!(f, "[")?;
+                let (open, close) = if self.simple_array() {
+                    ("[", "]")
+                } else {
+                    ("<<", ">>")
+                };
+
+                write!(f, "{}", open)?;
                 for v in &vec.values {
                     write!(f, " {} ", v)?;
                 }
-                write!(f, "]")?;
+                write!(f, "{}", close)?;
                 Ok(())
             }
         }
