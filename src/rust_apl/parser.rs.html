@@ -199,13 +199,6 @@
 <span id="194">194</span>
 <span id="195">195</span>
 <span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::err::AplError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::expr::Expr</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::token</span>::{<span class="ident">Token</span>, <span class="ident">TokenType</span>};
@@ -393,19 +386,12 @@
             };
         }
 
-        <span class="comment">//println!(&quot;What it looks like before we maybe enclose&quot;);</span>
-        <span class="comment">//println!(&quot;{:#?}&quot;, v);</span>
-
-        <span class="kw">let</span> <span class="ident">all_lit</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">s</span>, <span class="ident">Expr::Literal</span>(<span class="kw">_</span>)));
-
         <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_empty</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">Expr::Null</span>)
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">v</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>())
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">all_lit</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">Expr::Array</span>(<span class="ident">v</span>.<span class="ident">into_iter</span>().<span class="ident">rev</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span><span class="op">&gt;</span>()))
         } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">Expr::Enclose</span>(<span class="ident">v</span>.<span class="ident">into_iter</span>().<span class="ident">rev</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span><span class="op">&gt;</span>()))
+            <span class="prelude-val">Ok</span>(<span class="ident">Expr::Array</span>(<span class="ident">v</span>.<span class="ident">into_iter</span>().<span class="ident">rev</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span><span class="op">&gt;</span>()))
         }
     }
 }
