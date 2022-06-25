@@ -53,7 +53,7 @@ fn main() {
             file.read_to_string(&mut buffer).unwrap();
 
             match run(buffer, &mut interpreter, args.verbose) {
-                Ok(_) => (),
+                Ok(vals) => vals.iter().map(|x| println!("{}", x)).collect(),
                 Err(errs) => println!("{}", errs),
             }
         }
@@ -67,7 +67,7 @@ fn main() {
                     Ok(line) => {
                         rl.add_history_entry(line.as_str());
                         match run(format!("{}\n", line), &mut interpreter, args.verbose) {
-                            Ok(_) => (),
+                            Ok(vals) => vals.iter().map(|x| println!("{}", x)).collect(),
                             Err(errs) => println!("{}", errs),
                         }
                     }

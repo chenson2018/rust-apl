@@ -34,25 +34,8 @@ impl Interpreter {
         }
     }
 
-    pub fn interpret(&mut self, exprs: &Vec<Rc<Expr>>) -> Result<(), AplError> {
-        for e in exprs {
-            let res = self.evaluate(e);
-
-            match res {
-                Ok(val) => {
-                    println!("{}", val);
-                }
-                Err(err) => {
-                    return Err(err);
-                }
-            };
-        }
-
-        Ok(())
-    }
-
     // for unit testing
-    pub fn eval(&mut self, exprs: &Vec<Rc<Expr>>) -> Result<Vec<AplType>, AplError> {
+    pub fn interpret(&mut self, exprs: &Vec<Rc<Expr>>) -> Result<Vec<AplType>, AplError> {
         let mut v: Vec<AplType> = Vec::new();
 
         for e in exprs {
