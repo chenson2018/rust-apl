@@ -199,6 +199,25 @@
 <span id="194">194</span>
 <span id="195">195</span>
 <span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::err::AplError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::expr::Expr</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::token</span>::{<span class="ident">Token</span>, <span class="ident">TokenType</span>};
@@ -293,12 +312,31 @@
 
     <span class="doccomment">/// check if all tokens have been parsed</span>
     <span class="kw">fn</span> <span class="ident">at_end</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">peek</span>().<span class="ident">token</span> <span class="op">==</span> <span class="ident">TokenType::Newline</span>
+        <span class="self">self</span>.<span class="ident">peek</span>().<span class="ident">token</span> <span class="op">==</span> <span class="ident">TokenType::Eof</span>
     }
 
     <span class="doccomment">/// parse `self.tokens` into an [expr::Expr](crate::expr::Expr)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span>, <span class="ident">AplError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">expression</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">AplError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exprs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+
+        <span class="kw">while</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">at_end</span>() {
+            <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">expression</span>()<span class="question-mark">?</span>;
+
+            <span class="kw">match</span> <span class="ident">next</span> {
+                <span class="ident">Expr::Null</span> =&gt; {
+                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">peek</span>().<span class="ident">token</span> <span class="op">==</span> <span class="ident">TokenType::Newline</span> {
+                        <span class="self">self</span>.<span class="ident">advance</span>();
+                    } <span class="kw">else</span> {
+                        <span class="kw">break</span>;
+                    };
+                }
+                <span class="kw">_</span> =&gt; {
+                    <span class="ident">exprs</span>.<span class="ident">push</span>(<span class="ident">Rc::new</span>(<span class="ident">next</span>));
+                }
+            };
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="ident">exprs</span>)
     }
 
     <span class="doccomment">/// parse an expression into an [expr::Expr](crate::expr::Expr)</span>
