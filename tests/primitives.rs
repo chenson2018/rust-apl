@@ -1,21 +1,21 @@
 #[cfg(test)]
 mod test {
     use rust_apl::interpreter::Interpreter;
-    use rust_apl::run::run;
+    use rust_apl::run::eval;
 
     fn apl_assert(left: &str, right: &str) {
         let l = format!("{}\n", left);
         let r = format!("{}\n", right);
 
         assert_eq!(
-            run(l, &mut Interpreter::new(), false).unwrap(),
-            run(r, &mut Interpreter::new(), false).unwrap()
+            eval(l, &mut Interpreter::new()).unwrap(),
+            eval(r, &mut Interpreter::new()).unwrap()
         );
     }
 
     fn assert_err(expr: &str) {
         let e = format!("{}\n", expr);
-        let value = run(e, &mut Interpreter::new(), false);
+        let value = eval(e, &mut Interpreter::new());
         assert!(value.is_err())
     }
 
@@ -25,11 +25,11 @@ mod test {
 
         for l in left {
             let s = format!("{}\n", l);
-            results.push(run(s, &mut interpreter, false).unwrap())
+            results.push(eval(s, &mut interpreter).unwrap())
         }
 
         let r = format!("{}\n", right);
-        let r_val = run(r, &mut Interpreter::new(), false).unwrap();
+        let r_val = eval(r, &mut Interpreter::new()).unwrap();
 
         assert_eq!(*results.last().unwrap(), r_val);
     }

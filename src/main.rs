@@ -5,13 +5,11 @@ use rustyline::Editor;
 
 use std::error::Error;
 use std::fs::File;
-//use std::io::prelude::*;
-use std::io::BufRead;
-use std::io::BufReader;
 use std::path::Path;
 
 use rust_apl::interpreter::Interpreter;
 use rust_apl::run::run;
+use std::io::Read;
 
 // this struct defines our command line arguments
 /// A Rust Implementation of APL
@@ -41,7 +39,7 @@ fn main() {
             let display = path.display();
 
             // Open the path in read-only mode, returns `io::Result<File>`
-            let file = match File::open(&path) {
+            let mut file = match File::open(&path) {
                 // The `description` method of `io::Error` returns a string that describes the error
                 Err(why) => panic!(
                     "couldn't open {}: {}",
@@ -51,19 +49,12 @@ fn main() {
                 Ok(file) => file,
             };
 
-            // Collect all lines into a vector
-            let reader = BufReader::new(file);
-            let lines: Vec<_> = reader.lines().collect();
+            let mut buffer = String::new();
+            file.read_to_string(&mut buffer).unwrap();
 
-            for l in lines {
-                // there HAS to be a better way to read and keep new lines
-                let mut s = l.unwrap();
-                s.push('\n');
-
-                match run(s, &mut interpreter, args.verbose) {
-                    Ok(value) => println!("{}", value),
-                    Err(err) => println!("{}", err),
-                };
+            match run(buffer, &mut interpreter, args.verbose) {
+                Ok(_) => (),
+                Err(errs) => println!("{}", errs),
             }
         }
 
@@ -76,7 +67,7 @@ fn main() {
                     Ok(line) => {
                         rl.add_history_entry(line.as_str());
                         match run(format!("{}\n", line), &mut interpreter, args.verbose) {
-                            Ok(value) => println!("{}", value),
+                            Ok(_) => (),
                             Err(errs) => println!("{}", errs),
                         }
                     }

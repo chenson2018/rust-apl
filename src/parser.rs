@@ -92,12 +92,31 @@ impl Parser {
 
     /// check if all tokens have been parsed
     fn at_end(&mut self) -> bool {
-        self.peek().token == TokenType::Newline
+        self.peek().token == TokenType::Eof
     }
 
     /// parse `self.tokens` into an [expr::Expr](crate::expr::Expr)
-    pub fn parse(&mut self) -> Result<Expr, AplError> {
-        self.expression()
+    pub fn parse(&mut self) -> Result<Vec<Rc<Expr>>, AplError> {
+        let mut exprs: Vec<Rc<Expr>> = Vec::new();
+
+        while !self.at_end() {
+            let next = self.expression()?;
+
+            match next {
+                Expr::Null => {
+                    if self.peek().token == TokenType::Newline {
+                        self.advance();
+                    } else {
+                        break;
+                    };
+                }
+                _ => {
+                    exprs.push(Rc::new(next));
+                }
+            };
+        }
+
+        Ok(exprs)
     }
 
     /// parse an expression into an [expr::Expr](crate::expr::Expr)

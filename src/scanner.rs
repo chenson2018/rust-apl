@@ -117,8 +117,8 @@ impl Scanner {
 
                     // end of line
                     '\n' => {
-                        self.line += 1;
                         self.add(TokenType::Newline);
+                        self.line += 1;
                     }
 
                     // whitespace
@@ -133,7 +133,7 @@ impl Scanner {
                                 errs.push(e);
                                 failed = true;
                             };
-                        } else if c.is_alphabetic() || c == '_' || c == '-' {
+                        } else if c.is_alphabetic() || c == '_' {
                             self.identifier();
                         } else {
                             errs.push(AplError::new("Unexpected character".to_string(), self.line));
@@ -180,12 +180,13 @@ impl Scanner {
                 failed = true;
             }
         }
-        //        self.tokens.push(Token {
-        //            token: TokenType::Eof,
-        //            lexeme: "".to_string(),
-        //            line: self.line,
-        //            literal: None,
-        //        });
+
+        self.tokens.push(Token {
+            token: TokenType::Eof,
+            lexeme: "".to_string(),
+            line: self.line,
+            literal: None,
+        });
 
         // transformation to reverse each line
         let mut line_counter = 0;
@@ -217,6 +218,7 @@ impl Scanner {
     fn string(&mut self) -> Result<(), AplError> {
         while self.peek() != '\'' && !(self.is_end()) {
             if self.peek() == '\n' {
+                self.add(TokenType::Newline);
                 self.line += 1;
             }
             self.advance();
@@ -270,6 +272,7 @@ impl Scanner {
                 self.advance();
             }
         }
+
         let s = &self.source[self.start..self.current]
             .iter()
             .collect::<String>();
@@ -294,7 +297,7 @@ impl Scanner {
     /// scan an identifier
     fn identifier(&mut self) {
         // TODO: need to come back and change these rules to match APL
-        while self.peek().is_alphanumeric() || self.peek() == '_' || self.peek() == '-' {
+        while self.peek().is_alphanumeric() || self.peek() == '_' {
             self.advance();
         }
         let s = (&self.source[self.start..self.current])

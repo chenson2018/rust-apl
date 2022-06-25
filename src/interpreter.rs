@@ -12,6 +12,7 @@ use crate::primitives::dyadic::*;
 use crate::primitives::monadic::*;
 
 use std::borrow::Borrow;
+use std::rc::Rc;
 
 #[derive(Clone)]
 pub struct Interpreter {
@@ -33,11 +34,44 @@ impl Interpreter {
         }
     }
 
-    pub fn interpret(&mut self, e: &Expr) -> Result<AplType, AplError> {
-        self.evaluate(e)
+    pub fn interpret(&mut self, exprs: &Vec<Rc<Expr>>) -> Result<(), AplError> {
+        for e in exprs {
+            let res = self.evaluate(e);
+
+            match res {
+                Ok(val) => {
+                    println!("{}", val);
+                }
+                Err(err) => {
+                    return Err(err);
+                }
+            };
+        }
+
+        Ok(())
     }
 
-    fn evaluate(&mut self, e: &Expr) -> Result<AplType, AplError> {
+    // for unit testing
+    pub fn eval(&mut self, exprs: &Vec<Rc<Expr>>) -> Result<Vec<AplType>, AplError> {
+        let mut v: Vec<AplType> = Vec::new();
+
+        for e in exprs {
+            let res = self.evaluate(e);
+
+            match res {
+                Ok(val) => {
+                    v.push(val);
+                }
+                Err(err) => {
+                    return Err(err);
+                }
+            };
+        }
+
+        Ok(v)
+    }
+
+    pub fn evaluate(&mut self, e: &Expr) -> Result<AplType, AplError> {
         match e {
             Expr::Null => Ok(AplType::Null),
             Expr::Array(ref t) => {
