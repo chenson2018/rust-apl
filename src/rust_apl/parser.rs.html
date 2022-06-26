@@ -218,6 +218,25 @@
 <span id="213">213</span>
 <span id="214">214</span>
 <span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::err::AplError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::expr::Expr</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::token</span>::{<span class="ident">Token</span>, <span class="ident">TokenType</span>};
@@ -276,11 +295,25 @@
     }
 
     <span class="doccomment">/// advance the parser a `Token` with the specified `TokenType` is found</span>
-    <span class="kw">fn</span> <span class="ident">consume</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">TokenType</span>, <span class="ident">msg</span>: <span class="ident">String</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Token</span>, <span class="ident">AplError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">consume</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">t</span>: <span class="ident">TokenType</span>,
+        <span class="ident">msg</span>: <span class="ident">String</span>,
+        <span class="ident">start</span>: <span class="ident">usize</span>,
+        <span class="ident">end</span>: <span class="ident">usize</span>,
+        <span class="ident">line</span>: <span class="ident">usize</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Token</span>, <span class="ident">AplError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">check</span>(<span class="ident">t</span>) {
             <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">advance</span>())
         } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">AplError::new</span>(<span class="ident">msg</span>, <span class="self">self</span>.<span class="ident">peek</span>().<span class="ident">line</span>))
+            <span class="prelude-val">Err</span>(<span class="ident">AplError::with_pos</span>(
+                <span class="ident">msg</span>,
+                <span class="ident">line</span>,
+                <span class="ident">start</span>,
+                <span class="ident">end</span>,
+                <span class="string">&quot;this parenthesis is unmatched&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="string">&quot;expression does not parse&quot;</span>.<span class="ident">to_string</span>(),
+            ))
         }
     }
 
@@ -413,10 +446,15 @@
                     ),
                 }
             } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">match_t</span>(<span class="macro">vec!</span>[<span class="ident">TokenType::RightParenthesis</span>]) {
+                <span class="kw">let</span> <span class="ident">cur</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">previous</span>();
+
                 <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">expression</span>()<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">consume</span>(
                     <span class="ident">TokenType::LeftParenthesis</span>,
                     <span class="string">&quot;Expected &#39;(&#39; after expression&quot;</span>.<span class="ident">to_string</span>(),
+                    <span class="ident">cur</span>.<span class="ident">start</span>,
+                    <span class="ident">cur</span>.<span class="ident">end</span>,
+                    <span class="ident">cur</span>.<span class="ident">line</span>,
                 )<span class="question-mark">?</span>;
                 <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">Expr::Grouping</span>(<span class="ident">Rc::new</span>(<span class="ident">e</span>)))
             } <span class="kw">else</span> {

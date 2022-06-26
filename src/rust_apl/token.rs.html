@@ -200,6 +200,8 @@
 <span id="195">195</span>
 <span id="196">196</span>
 <span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::apl_type::AplType</span>;
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -209,6 +211,8 @@
     <span class="kw">pub</span> <span class="ident">lexeme</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">literal</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AplType</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">line</span>: <span class="ident">usize</span>,
+    <span class="kw">pub</span> <span class="ident">start</span>: <span class="ident">usize</span>,
+    <span class="kw">pub</span> <span class="ident">end</span>: <span class="ident">usize</span>,
 }
 
 <span class="doccomment">/// An enum for representing the allowed tokens in APL.</span>

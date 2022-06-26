@@ -311,6 +311,12 @@
 <span id="306">306</span>
 <span id="307">307</span>
 <span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::io</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::apl_type::AplType</span>;
@@ -370,6 +376,8 @@
             <span class="ident">lexeme</span>,
             <span class="ident">line</span>: <span class="self">self</span>.<span class="ident">line</span>,
             <span class="ident">literal</span>: <span class="prelude-val">None</span>,
+            <span class="ident">start</span>: <span class="self">self</span>.<span class="ident">start</span>,
+            <span class="ident">end</span>: <span class="self">self</span>.<span class="ident">current</span>,
         });
     }
 
@@ -384,6 +392,8 @@
             <span class="ident">lexeme</span>,
             <span class="ident">line</span>: <span class="self">self</span>.<span class="ident">line</span>,
             <span class="ident">literal</span>: <span class="prelude-val">Some</span>(<span class="ident">l</span>),
+            <span class="ident">start</span>: <span class="self">self</span>.<span class="ident">start</span>,
+            <span class="ident">end</span>: <span class="self">self</span>.<span class="ident">current</span>,
         });
     }
 
@@ -499,6 +509,8 @@
             <span class="ident">lexeme</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">line</span>: <span class="self">self</span>.<span class="ident">line</span>,
             <span class="ident">literal</span>: <span class="prelude-val">None</span>,
+            <span class="ident">start</span>: <span class="self">self</span>.<span class="ident">start</span>,
+            <span class="ident">end</span>: <span class="self">self</span>.<span class="ident">current</span>,
         });
 
         <span class="comment">// transformation to reverse each line</span>
