@@ -63,7 +63,7 @@ extern crate lazy_static;
 
 mod apl_type;
 mod environment;
-mod err;
+pub mod err;
 mod expr;
 mod primitives;
 mod token;

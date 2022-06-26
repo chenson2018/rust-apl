@@ -56,11 +56,25 @@ impl Parser {
     }
 
     /// advance the parser a `Token` with the specified `TokenType` is found
-    fn consume(&mut self, t: TokenType, msg: String) -> Result<Token, AplError> {
+    fn consume(
+        &mut self,
+        t: TokenType,
+        msg: String,
+        start: usize,
+        end: usize,
+        line: usize,
+    ) -> Result<Token, AplError> {
         if self.check(t) {
             Ok(self.advance())
         } else {
-            Err(AplError::new(msg, self.peek().line))
+            Err(AplError::with_pos(
+                msg,
+                line,
+                start,
+                end,
+                "this parenthesis is unmatched".to_string(),
+                "expression does not parse".to_string(),
+            ))
         }
     }
 
@@ -193,10 +207,15 @@ impl Parser {
                     ),
                 }
             } else if self.match_t(vec![TokenType::RightParenthesis]) {
+                let cur = self.previous();
+
                 let e = self.expression()?;
                 self.consume(
                     TokenType::LeftParenthesis,
                     "Expected '(' after expression".to_string(),
+                    cur.start,
+                    cur.end,
+                    cur.line,
                 )?;
                 v.push(Expr::Grouping(Rc::new(e)))
             } else {

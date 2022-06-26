@@ -57,6 +57,8 @@ impl Scanner {
             lexeme,
             line: self.line,
             literal: None,
+            start: self.start,
+            end: self.current,
         });
     }
 
@@ -71,6 +73,8 @@ impl Scanner {
             lexeme,
             line: self.line,
             literal: Some(l),
+            start: self.start,
+            end: self.current,
         });
     }
 
@@ -186,6 +190,8 @@ impl Scanner {
             lexeme: "".to_string(),
             line: self.line,
             literal: None,
+            start: self.start,
+            end: self.current,
         });
 
         // transformation to reverse each line

@@ -11,6 +11,13 @@ use rust_apl::interpreter::Interpreter;
 use rust_apl::run::run;
 use std::io::Read;
 
+use codespan_reporting::diagnostic::{Diagnostic, Label};
+use codespan_reporting::files::SimpleFiles;
+use codespan_reporting::term::termcolor::{ColorChoice, StandardStream};
+//use codespan_reporting::term::emit;
+
+use rust_apl::err::AplErrors;
+
 // this struct defines our command line arguments
 /// A Rust Implementation of APL
 #[derive(Parser, Debug)]
@@ -61,14 +68,46 @@ fn main() {
         // otherwise enter an interactive session
         None => {
             let mut rl = Editor::<()>::new();
+            let mut files = SimpleFiles::new();
+
             loop {
                 let readline = rl.readline("> ");
+
                 match readline {
                     Ok(line) => {
                         rl.add_history_entry(line.as_str());
                         match run(format!("{}\n", line), &mut interpreter, args.verbose) {
                             Ok(vals) => vals.iter().map(|x| println!("{}", x)).collect(),
-                            Err(errs) => println!("{}", errs),
+                            Err(errs) => {
+                                let file_id = files.add("REPL", line.clone());
+
+                                match errs {
+                                    AplErrors(v) => {
+                                        for e in v {
+                                            let diagnostic = Diagnostic::error()
+                                                .with_message(e.message)
+                                                .with_labels(vec![Label::primary(
+                                                    file_id,
+                                                    (e.start)..(e.end),
+                                                )
+                                                .with_message(e.label)])
+                                                .with_notes(vec![e.err]);
+
+                                            let writer =
+                                                StandardStream::stderr(ColorChoice::Always);
+                                            let config =
+                                                codespan_reporting::term::Config::default();
+                                            codespan_reporting::term::emit(
+                                                &mut writer.lock(),
+                                                &config,
+                                                &files,
+                                                &diagnostic,
+                                            )
+                                            .unwrap();
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     Err(ReadlineError::Interrupted) => {

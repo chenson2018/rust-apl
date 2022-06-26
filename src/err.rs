@@ -5,8 +5,12 @@ use std::io;
 #[derive(Debug)]
 pub struct AplError {
     line: usize,
-    err: String,
+    pub err: String,
+    pub message: String,
+    pub label: String,
     lower: Option<io::Error>,
+    pub start: usize,
+    pub end: usize,
 }
 
 impl Error for AplError {
@@ -44,16 +48,43 @@ impl AplError {
     pub fn new(s: String, l: usize) -> AplError {
         AplError {
             line: l,
+            err: s.clone(),
+            lower: None,
+            label: s,
+            message: "".to_string(),
+            start: 0,
+            end: 0,
+        }
+    }
+
+    pub fn with_pos(
+        s: String,
+        l: usize,
+        start: usize,
+        end: usize,
+        label: String,
+        message: String,
+    ) -> AplError {
+        AplError {
+            line: l,
             err: s,
             lower: None,
+            start,
+            end,
+            label,
+            message,
         }
     }
 
     pub fn with_lower(s: String, l: usize, e: io::Error) -> AplError {
         AplError {
             line: l,
-            err: s,
+            err: s.clone(),
+            label: s,
             lower: Some(e),
+            start: 0,
+            end: 0,
+            message: "".to_string(),
         }
     }
 }

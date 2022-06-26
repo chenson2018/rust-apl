@@ -10,3 +10,5 @@ clap = { version = "3.2.5", features = ["derive"] }
 ndarray = "0.15.0"
 rustyline = "9.1.0"
 lazy_static = "1.4.0"
+codespan-reporting = "0.11.1"
+term = "0.7.0"

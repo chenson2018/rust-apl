@@ -7,6 +7,8 @@ pub struct Token {
     pub lexeme: String,
     pub literal: Option<AplType>,
     pub line: usize,
+    pub start: usize,
+    pub end: usize,
 }
 
 /// An enum for representing the allowed tokens in APL.
