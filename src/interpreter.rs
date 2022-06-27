@@ -68,7 +68,10 @@ impl Interpreter {
 
                 Ok(AplType::Array(AplArray { values, shape }))
             }
-            Expr::Literal(ref t) => Ok(t.clone()),
+            Expr::Literal(ref t) => match &t.literal {
+                Some(x) => Ok(x.clone()),
+                None => panic!("received a literal with no value"),
+            },
             Expr::Grouping(ref expr) => self.evaluate(expr),
             Expr::Dyadic(ref left, ref op, ref right) => {
                 let right = self.evaluate(right)?;

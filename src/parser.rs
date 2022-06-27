@@ -200,7 +200,7 @@ impl Parser {
             ]) {
                 match self.previous().token {
                     TokenType::Number | TokenType::String => {
-                        v.push(Expr::Literal(self.previous().literal.unwrap()));
+                        v.push(Expr::Literal(self.previous()));
                     }
                     TokenType::Identifier => {
                         v.push(Expr::Variable(self.previous()));

@@ -1,4 +1,3 @@
-use crate::apl_type::AplType;
 use crate::token::Token;
 use std::fmt;
 use std::rc::Rc;
@@ -8,7 +7,7 @@ pub enum Expr {
     Grouping(Rc<Expr>),
     Dyadic(Rc<Expr>, Token, Rc<Expr>),
     Monadic(Token, Rc<Expr>),
-    Literal(AplType),
+    Literal(Token),
     Variable(Token),
     Array(Vec<Expr>),
     Null,
@@ -24,8 +23,8 @@ impl fmt::Display for Expr {
             Expr::Grouping(ref e) => {
                 write!(f, "(group {})", e)
             }
-            Expr::Literal(ref l) => {
-                write!(f, "{}", l)
+            Expr::Literal(ref token) => {
+                write!(f, "{}", &token.lexeme)
             }
             Expr::Monadic(ref token, ref e) => {
                 write!(f, "({} {})", &token.lexeme, e)
