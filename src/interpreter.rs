@@ -26,8 +26,6 @@ impl Default for Interpreter {
     }
 }
 
-// TODO: properly report line of errors
-
 impl Interpreter {
     pub fn new() -> Interpreter {
         Interpreter {
