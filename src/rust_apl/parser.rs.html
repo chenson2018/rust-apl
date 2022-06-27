@@ -316,7 +316,7 @@
                 <span class="ident">start</span>,
                 <span class="ident">end</span>,
                 <span class="string">&quot;this parenthesis is unmatched&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="string">&quot;expression does not parse&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="string">&quot;parser&quot;</span>.<span class="ident">to_string</span>(),
             ))
         }
     }
@@ -413,7 +413,7 @@
                             <span class="ident">op</span>.<span class="ident">start</span>,
                             <span class="ident">op</span>.<span class="ident">end</span>,
                             <span class="string">&quot;this function is called monadically&quot;</span>.<span class="ident">to_string</span>(),
-                            <span class="string">&quot;expression does not parse&quot;</span>.<span class="ident">to_string</span>(),
+                            <span class="string">&quot;parser&quot;</span>.<span class="ident">to_string</span>(),
                         ));
                     } <span class="kw">else</span> {
                         <span class="ident">e</span> <span class="op">=</span> <span class="ident">Expr::Monadic</span>(<span class="ident">op</span>, <span class="ident">Rc::new</span>(<span class="ident">e</span>));
