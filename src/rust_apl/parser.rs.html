@@ -237,6 +237,10 @@
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::err::AplError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::expr::Expr</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::token</span>::{<span class="ident">Token</span>, <span class="ident">TokenType</span>};
@@ -403,9 +407,13 @@
             <span class="kw">match</span> <span class="ident">left</span> {
                 <span class="prelude-val">Ok</span>(<span class="ident">Expr::Null</span>) =&gt; {
                     <span class="kw">if</span> <span class="ident">DYADIC_ONLY</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">op</span>.<span class="ident">token</span>) {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">AplError::new</span>(
-                            <span class="string">&quot;Left argument required.&quot;</span>.<span class="ident">to_string</span>(),
+                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">AplError::with_pos</span>(
+                            <span class="string">&quot;Left argument required for dyadic functions&quot;</span>.<span class="ident">to_string</span>(),
                             <span class="ident">op</span>.<span class="ident">line</span>,
+                            <span class="ident">op</span>.<span class="ident">start</span>,
+                            <span class="ident">op</span>.<span class="ident">end</span>,
+                            <span class="string">&quot;this function is called monadically&quot;</span>.<span class="ident">to_string</span>(),
+                            <span class="string">&quot;expression does not parse&quot;</span>.<span class="ident">to_string</span>(),
                         ));
                     } <span class="kw">else</span> {
                         <span class="ident">e</span> <span class="op">=</span> <span class="ident">Expr::Monadic</span>(<span class="ident">op</span>, <span class="ident">Rc::new</span>(<span class="ident">e</span>));

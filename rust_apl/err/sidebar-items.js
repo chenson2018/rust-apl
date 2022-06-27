@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["AplError",""],["AplErrors",""]]});
+initSidebarItems({"struct":[["AplError",""],["AplErrors",""],["ErrCtx",""]]});

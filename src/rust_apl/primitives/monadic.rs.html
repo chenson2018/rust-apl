@@ -38,14 +38,18 @@
 <span id="33">33</span>
 <span id="34">34</span>
 <span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::apl_type::AplArray</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::apl_type::AplType</span>;
 <span class="comment">//use crate::apl_type::Scalar;</span>
 
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::err::ErrCtx</span>;
+
 <span class="comment">// TODO: handle shape of arrays</span>
 <span class="comment">// TODO: handle difference between ⍴&#39;&#39; and ⍴0</span>
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shape</span>(<span class="ident">_right</span>: <span class="ident">AplType</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AplType</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shape</span>(<span class="ident">_right</span>: <span class="ident">AplType</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AplType</span>, <span class="ident">ErrCtx</span><span class="op">&gt;</span> {
     <span class="macro">todo!</span>()
     <span class="comment">//    match right {</span>
     <span class="comment">//        AplType::Enclose(r) =&gt; Ok(AplType::Array(vec![Scalar::Number(r.len() as f64)])), //eventually get from shape...</span>
@@ -55,7 +59,7 @@
     <span class="comment">//    }</span>
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enclose</span>(<span class="ident">right</span>: <span class="ident">AplType</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AplType</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enclose</span>(<span class="ident">right</span>: <span class="ident">AplType</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AplType</span>, <span class="ident">ErrCtx</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">right</span> {
         <span class="ident">AplType::Name</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Call on unevaluated name.&quot;</span>),
         <span class="ident">AplType::Null</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Call on Null&quot;</span>),
@@ -67,7 +71,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negate</span>(<span class="ident">right</span>: <span class="ident">AplType</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AplType</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negate</span>(<span class="ident">right</span>: <span class="ident">AplType</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AplType</span>, <span class="ident">ErrCtx</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">f</span>(<span class="ident">right</span>: <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> {
         <span class="op">-</span><span class="ident">right</span>
     }
