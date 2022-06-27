@@ -40,7 +40,6 @@ pub fn run(s: String, i: &mut Interpreter, verbose: bool) -> Result<Vec<AplType>
     let ast_verified = ast.unwrap();
 
     if verbose {
-        println!("Polish notation: {:?}\n", &ast_verified);
         println!("Rust AST: {:#?}\n", &ast_verified);
     }
 

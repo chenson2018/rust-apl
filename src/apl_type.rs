@@ -8,6 +8,8 @@ use ndarray::Zip;
 use std::fmt;
 use std::iter;
 
+use crate::err::ErrCtx;
+
 #[derive(Debug, Clone)]
 pub enum AplType {
     Scalar(Scalar),
@@ -55,7 +57,7 @@ impl AplType {
         }
     }
 
-    pub fn scalar_monadic(self, f: &dyn Fn(f64) -> f64) -> Result<AplType, &'static str> {
+    pub fn scalar_monadic(self, f: &dyn Fn(f64) -> f64) -> Result<AplType, ErrCtx> {
         match self {
             AplType::Scalar(Scalar::Number(r)) => Ok(AplType::Scalar(Scalar::Number(f(r)))),
             AplType::Array(r) => {
@@ -74,7 +76,11 @@ impl AplType {
                     }))
                 }
             }
-            _ => Err("non numeric argument to scalar function"),
+            _ => Err(ErrCtx {
+                err: "Incompatible types".to_string(),
+                message: "expression does not interpret".to_string(),
+                label: "this function requires all numeric arguments".to_string(),
+            }),
         }
     }
 
@@ -82,7 +88,7 @@ impl AplType {
         self,
         other: AplType,
         f: &dyn Fn(f64, f64) -> f64,
-    ) -> Result<AplType, &'static str> {
+    ) -> Result<AplType, ErrCtx> {
         match (self, other) {
             (AplType::Scalar(Scalar::Number(l)), AplType::Scalar(Scalar::Number(r))) => {
                 Ok(AplType::Scalar(Scalar::Number(f(l, r))))
@@ -130,7 +136,11 @@ impl AplType {
             (AplType::Array(l), AplType::Array(r)) => {
                 if all_scalar(&l.values) && all_scalar(&r.values) {
                     if l.shape != r.shape {
-                        return Err("Incompatibile shapes");
+                        return Err(ErrCtx {
+                            err: "Incompatible shapes".to_string(),
+                            message: "expression does not interpret".to_string(),
+                            label: "array arguments must have matching shapes".to_string(),
+                        });
                     }
                     let mut res: ArrayBase<OwnedRepr<f64>, Dim<IxDynImpl>> =
                         ArrayBase::zeros(r.shape.clone());
@@ -167,7 +177,11 @@ impl AplType {
                     Ok(AplType::Array(AplArray { values, shape }))
                 } else {
                     if l.shape != r.shape {
-                        return Err("Incompatibile shapes");
+                        return Err(ErrCtx {
+                            err: "Incompatible shapes".to_string(),
+                            message: "expression does not interpret".to_string(),
+                            label: "array arguments must have matching shapes".to_string(),
+                        });
                     }
 
                     let shape = r.shape;
@@ -182,7 +196,11 @@ impl AplType {
                     Ok(AplType::Array(AplArray { values, shape }))
                 }
             }
-            _ => Err("non numeric argument to scalar function"),
+            _ => Err(ErrCtx {
+                err: "Incompatible types".to_string(),
+                message: "expression does not interpret".to_string(),
+                label: "this function requires all numeric arguments".to_string(),
+            }),
         }
     }
 }

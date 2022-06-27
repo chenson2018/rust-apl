@@ -13,6 +13,13 @@ pub struct AplError {
     pub end: usize,
 }
 
+#[derive(Debug)]
+pub struct ErrCtx {
+    pub err: String,
+    pub message: String,
+    pub label: String,
+}
+
 impl Error for AplError {
     fn description(&self) -> &str {
         &self.err
@@ -45,18 +52,6 @@ impl fmt::Display for AplErrors {
 }
 
 impl AplError {
-    pub fn new(s: String, l: usize) -> AplError {
-        AplError {
-            line: l,
-            err: s.clone(),
-            lower: None,
-            label: s,
-            message: "".to_string(),
-            start: 0,
-            end: 0,
-        }
-    }
-
     pub fn with_pos(
         s: String,
         l: usize,
@@ -73,18 +68,6 @@ impl AplError {
             end,
             label,
             message,
-        }
-    }
-
-    pub fn with_lower(s: String, l: usize, e: io::Error) -> AplError {
-        AplError {
-            line: l,
-            err: s.clone(),
-            label: s,
-            lower: Some(e),
-            start: 0,
-            end: 0,
-            message: "".to_string(),
         }
     }
 }

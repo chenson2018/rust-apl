@@ -1,5 +1,6 @@
 use crate::apl_type::AplType;
 use crate::err::AplError;
+use crate::err::ErrCtx;
 use crate::expr::Expr;
 use crate::token::TokenType;
 
@@ -79,7 +80,11 @@ impl Interpreter {
                             self.env.define(&t.lexeme, right);
                             Ok(AplType::Null)
                         }
-                        _ => Err("Attempt to modify constant."),
+                        _ => Err(ErrCtx {
+                            err: "Attempt to modify constant".to_string(),
+                            message: "expression does not interpret".to_string(),
+                            label: "invalid assignment".to_string(),
+                        }),
                     },
                     _ => {
                         let left = self.evaluate(left)?;
@@ -94,7 +99,14 @@ impl Interpreter {
 
                 match res {
                     Ok(value) => Ok(value),
-                    Err(err) => Err(AplError::new(err.to_string(), 0)),
+                    Err(ctx) => Err(AplError::with_pos(
+                        ctx.err,
+                        op.line,
+                        op.start,
+                        op.end,
+                        ctx.label,
+                        ctx.message,
+                    )),
                 }
             }
             Expr::Monadic(ref op, ref right) => {
@@ -109,12 +121,26 @@ impl Interpreter {
 
                 match res {
                     Ok(value) => Ok(value),
-                    Err(err) => Err(AplError::new(err.to_string(), 0)),
+                    Err(ctx) => Err(AplError::with_pos(
+                        ctx.err,
+                        op.line,
+                        op.start,
+                        op.end,
+                        ctx.label,
+                        ctx.message,
+                    )),
                 }
             }
             Expr::Variable(t) => match self.env.get(&t.lexeme) {
                 Some(r) => Ok(r),
-                None => Err(AplError::new("Variable not found".to_string(), t.line)),
+                None => Err(AplError::with_pos(
+                    "Variable not found".to_string(),
+                    t.line,
+                    t.start,
+                    t.end,
+                    "this variable is not defined".to_string(),
+                    "expression does not interpret".to_string(),
+                )),
             },
         }
     }

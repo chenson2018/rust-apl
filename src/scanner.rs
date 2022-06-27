@@ -1,5 +1,3 @@
-use std::io;
-
 use crate::apl_type::AplType;
 use crate::apl_type::Scalar;
 use crate::err::AplError;
@@ -140,7 +138,14 @@ impl Scanner {
                         } else if c.is_alphabetic() || c == '_' {
                             self.identifier();
                         } else {
-                            errs.push(AplError::new("Unexpected character".to_string(), self.line));
+                            errs.push(AplError::with_pos(
+                                "Unexpected character".to_string(),
+                                self.line,
+                                self.current,
+                                self.current,
+                                "this character is invalid".to_string(),
+                                "expression does not scan".to_string(),
+                            ));
                         }
                     }
                 };
@@ -222,6 +227,8 @@ impl Scanner {
 
     /// scan a string
     fn string(&mut self) -> Result<(), AplError> {
+        let start = self.current;
+
         while self.peek() != '\'' && !(self.is_end()) {
             if self.peek() == '\n' {
                 self.add(TokenType::Newline);
@@ -231,7 +238,14 @@ impl Scanner {
         }
 
         if self.is_end() {
-            return Err(AplError::new("Unterminated string".to_string(), self.line));
+            return Err(AplError::with_pos(
+                "Unterminated string".to_string(),
+                self.line,
+                0,
+                start,
+                "this string is not terninated".to_string(),
+                "expression does not scan".to_string(),
+            ));
         }
 
         self.advance();
@@ -288,11 +302,14 @@ impl Scanner {
                 TokenType::Number,
                 AplType::Scalar(Scalar::Number(scale * n)),
             ),
-            Err(e) => {
-                return Err(AplError::with_lower(
+            Err(_) => {
+                return Err(AplError::with_pos(
                     "Invalid number".to_string(),
                     self.line,
-                    io::Error::new(io::ErrorKind::Other, e),
+                    self.current,
+                    self.current,
+                    "this number is invalid".to_string(),
+                    "expression does not scan".to_string(),
                 ))
             }
         };

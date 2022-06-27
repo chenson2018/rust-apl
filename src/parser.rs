@@ -164,9 +164,13 @@ impl Parser {
             match left {
                 Ok(Expr::Null) => {
                     if DYADIC_ONLY.contains(&op.token) {
-                        return Err(AplError::new(
-                            "Left argument required.".to_string(),
+                        return Err(AplError::with_pos(
+                            "Left argument required for dyadic functions".to_string(),
                             op.line,
+                            op.start,
+                            op.end,
+                            "this function is called monadically".to_string(),
+                            "expression does not parse".to_string(),
                         ));
                     } else {
                         e = Expr::Monadic(op, Rc::new(e));
