@@ -85,7 +85,7 @@ impl Interpreter {
                         }
                         _ => Err(ErrCtx {
                             err: "Attempt to modify constant".to_string(),
-                            message: "expression does not interpret".to_string(),
+                            message: "interpreter".to_string(),
                             label: "invalid assignment".to_string(),
                         }),
                     },
@@ -142,7 +142,7 @@ impl Interpreter {
                     t.start,
                     t.end,
                     "this variable is not defined".to_string(),
-                    "expression does not interpret".to_string(),
+                    "interpreter".to_string(),
                 )),
             },
         }

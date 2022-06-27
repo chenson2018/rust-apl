@@ -144,7 +144,7 @@ impl Scanner {
                                 self.current,
                                 self.current,
                                 "this character is invalid".to_string(),
-                                "expression does not scan".to_string(),
+                                "scanner".to_string(),
                             ));
                         }
                     }
@@ -243,8 +243,8 @@ impl Scanner {
                 self.line,
                 0,
                 start,
-                "this string is not terninated".to_string(),
-                "expression does not scan".to_string(),
+                "this string is not terminated".to_string(),
+                "scanner".to_string(),
             ));
         }
 
@@ -309,7 +309,7 @@ impl Scanner {
                     self.current,
                     self.current,
                     "this number is invalid".to_string(),
-                    "expression does not scan".to_string(),
+                    "scanner".to_string(),
                 ))
             }
         };

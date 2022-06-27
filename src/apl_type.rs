@@ -78,7 +78,7 @@ impl AplType {
             }
             _ => Err(ErrCtx {
                 err: "Incompatible types".to_string(),
-                message: "expression does not interpret".to_string(),
+                message: "interpreter".to_string(),
                 label: "this function requires all numeric arguments".to_string(),
             }),
         }
@@ -138,7 +138,7 @@ impl AplType {
                     if l.shape != r.shape {
                         return Err(ErrCtx {
                             err: "Incompatible shapes".to_string(),
-                            message: "expression does not interpret".to_string(),
+                            message: "interpreter".to_string(),
                             label: "array arguments must have matching shapes".to_string(),
                         });
                     }
@@ -179,7 +179,7 @@ impl AplType {
                     if l.shape != r.shape {
                         return Err(ErrCtx {
                             err: "Incompatible shapes".to_string(),
-                            message: "expression does not interpret".to_string(),
+                            message: "interpreter".to_string(),
                             label: "array arguments must have matching shapes".to_string(),
                         });
                     }
@@ -198,7 +198,7 @@ impl AplType {
             }
             _ => Err(ErrCtx {
                 err: "Incompatible types".to_string(),
-                message: "expression does not interpret".to_string(),
+                message: "interpreter".to_string(),
                 label: "this function requires all numeric arguments".to_string(),
             }),
         }

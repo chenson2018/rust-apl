@@ -85,13 +85,14 @@ fn main() {
                                     AplErrors(v) => {
                                         for e in v {
                                             let diagnostic = Diagnostic::error()
-                                                .with_message(e.message)
+                                                //                                                .with_notes(vec![e.err])  // Can't decide how to format this part
+                                                .with_message(e.err)
+                                                .with_code(e.message)
                                                 .with_labels(vec![Label::primary(
                                                     file_id,
                                                     (e.start)..(e.end),
                                                 )
-                                                .with_message(e.label)])
-                                                .with_notes(vec![e.err]);
+                                                .with_message(e.label)]);
 
                                             let writer =
                                                 StandardStream::stderr(ColorChoice::Always);

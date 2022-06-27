@@ -73,7 +73,7 @@ impl Parser {
                 start,
                 end,
                 "this parenthesis is unmatched".to_string(),
-                "expression does not parse".to_string(),
+                "parser".to_string(),
             ))
         }
     }
@@ -170,7 +170,7 @@ impl Parser {
                             op.start,
                             op.end,
                             "this function is called monadically".to_string(),
-                            "expression does not parse".to_string(),
+                            "parser".to_string(),
                         ));
                     } else {
                         e = Expr::Monadic(op, Rc::new(e));
