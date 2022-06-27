@@ -443,7 +443,7 @@
             ]) {
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">previous</span>().<span class="ident">token</span> {
                     <span class="ident">TokenType::Number</span> <span class="op">|</span> <span class="ident">TokenType::String</span> =&gt; {
-                        <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">Expr::Literal</span>(<span class="self">self</span>.<span class="ident">previous</span>().<span class="ident">literal</span>.<span class="ident">unwrap</span>()));
+                        <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">Expr::Literal</span>(<span class="self">self</span>.<span class="ident">previous</span>()));
                     }
                     <span class="ident">TokenType::Identifier</span> =&gt; {
                         <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">Expr::Variable</span>(<span class="self">self</span>.<span class="ident">previous</span>()));
